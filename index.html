@@ -112,6 +112,31 @@
     @keyframes successBg {
       0% { opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; }
     }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+    .feat-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+    .feat-card:hover {
+      transform: scale(1.02);
+      border-color: transparent;
+      background: linear-gradient(#fff,#fff) padding-box,
+        linear-gradient(135deg,#6366f1,#a5b4fc) border-box;
+      box-shadow: 0 8px 32px rgba(99,102,241,0.14);
+    }
+    .scroll-anim {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 600ms cubic-bezier(0.16,1,0.3,1),
+                  transform 600ms cubic-bezier(0.16,1,0.3,1);
+    }
+    .scroll-anim.visible { opacity: 1; transform: translateY(0); }
+    @media (max-width:767px) {
+      .hero-grid { grid-template-columns: 1fr !important; }
+      .hero-mockup { display: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -120,7 +145,7 @@
 <div id="view-landing" class="view active" style="background:#fff;min-height:100vh">
 
   <!-- Navbar -->
-  <nav style="position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.95);backdrop-filter:blur(8px);border-bottom:1.5px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between">
+  <nav id="landing-nav" style="position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.95);backdrop-filter:blur(8px);border-bottom:1.5px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;transition:box-shadow 0.2s ease,border-color 0.2s ease">
     <div style="display:flex;align-items:center;gap:8px">
       <div style="width:30px;height:30px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
@@ -131,67 +156,89 @@
   </nav>
 
   <!-- Hero -->
-  <section style="padding:80px 24px 60px;text-align:center;background:linear-gradient(160deg,#F5F3FF 0%,#EEF2FF 40%,#F8F9FF 100%)">
-    <div style="max-width:700px;margin:0 auto">
-      <span class="pill pill-primary" style="margin-bottom:20px;display:inline-flex;font-size:12px">✨ Kostenlos · Kein Konto nötig · DSGVO-konform</span>
-      <h1 style="font-size:clamp(32px,5vw,54px);font-weight:700;line-height:1.15;color:var(--text);margin:12px 0 20px">Mehr Aufträge,<br><span style="color:var(--primary)">weniger Papierkram</span></h1>
-      <p style="font-size:clamp(15px,2vw,18px);color:var(--muted);line-height:1.6;margin-bottom:32px">Professionelle Angebote in unter 2 Minuten.<br>Direkt per E-Mail an deinen Kunden.</p>
-      <button class="btn btn-primary" onclick="goToEmailGate()" style="font-size:16px;padding:14px 32px;border-radius:10px">Jetzt kostenlos testen →</button>
-      <p style="font-size:12px;color:var(--muted);margin-top:12px">Kostenlos · Kein Konto nötig · DSGVO-konform</p>
-    </div>
-    <!-- App mockup -->
-    <div style="max-width:860px;margin:48px auto 0;background:#fff;border-radius:16px;box-shadow:0 24px 80px rgba(99,102,241,0.18);border:1.5px solid var(--border);overflow:hidden">
-      <div style="background:var(--primary);padding:10px 16px;display:flex;align-items:center;gap:8px">
-        <div style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.3)"></div>
-        <div style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.3)"></div>
-        <div style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.3)"></div>
-        <span style="color:rgba(255,255,255,0.7);font-size:11px;margin-left:8px">angebot-now.de</span>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;min-height:220px">
-        <div style="padding:16px;border-right:1.5px solid var(--border)">
-          <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Absender</div>
-          <div style="background:var(--surface);border-radius:6px;padding:8px;margin-bottom:8px">
-            <div style="height:8px;background:#E5E7EB;border-radius:4px;margin-bottom:5px;width:80%"></div>
-            <div style="height:8px;background:#E5E7EB;border-radius:4px;width:60%"></div>
-          </div>
-          <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;margin:10px 0 8px">Positionen</div>
-          <div style="border:1.5px solid var(--border);border-radius:6px;overflow:hidden;font-size:10px">
-            <div style="background:var(--primary);color:#fff;padding:5px 8px;display:grid;grid-template-columns:2fr 1fr 1fr;gap:4px"><span>Beschreibung</span><span>Menge</span><span style="text-align:right">GP</span></div>
-            <div style="padding:5px 8px;display:grid;grid-template-columns:2fr 1fr 1fr;gap:4px;border-bottom:1px solid var(--border)"><span style="color:var(--text)">Heizungsanlage</span><span>1 pausch.</span><span style="text-align:right;font-weight:600">2.400 €</span></div>
-            <div style="padding:5px 8px;background:var(--surface);display:grid;grid-template-columns:2fr 1fr 1fr;gap:4px"><span style="color:var(--text)">Heizkörper Montage</span><span>5 Stk.</span><span style="text-align:right;font-weight:600">900 €</span></div>
-          </div>
+  <section style="padding:80px 24px 80px;background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#4338ca 100%);position:relative;overflow:hidden;min-height:calc(100vh - 60px);display:flex;align-items:center">
+    <div class="hero-grid" style="max-width:1100px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center">
+      <!-- Left: headline + CTA -->
+      <div>
+        <span style="display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(165,180,252,0.15);border:1px solid rgba(165,180,252,0.3);border-radius:999px;font-size:12px;font-weight:600;color:#a5b4fc;margin-bottom:28px">
+          ✨ Kostenlos · Kein Konto nötig · DSGVO-konform
+        </span>
+        <h1 style="font-size:clamp(40px,5vw,64px);font-weight:800;line-height:1.1;color:#fff;margin:0 0 24px">
+          Mehr Aufträge,<br><span style="color:#a5b4fc">weniger Papierkram</span>
+        </h1>
+        <p style="font-size:clamp(15px,2vw,18px);color:rgba(255,255,255,0.72);line-height:1.6;margin-bottom:36px">
+          Professionelle Angebote in unter 2 Minuten.<br>Direkt per E-Mail an deinen Kunden.
+        </p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+          <button onclick="goToEmailGate()"
+            style="font-size:16px;padding:16px 32px;border-radius:999px;background:#6366F1;color:#fff;border:none;cursor:pointer;font-weight:700;font-family:var(--font);transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 24px rgba(99,102,241,0.5)"
+            onmouseover="this.style.transform='scale(1.04)';this.style.boxShadow='0 8px 32px rgba(99,102,241,0.65)'"
+            onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 24px rgba(99,102,241,0.5)'">
+            Jetzt kostenlos testen →
+          </button>
+          <span style="font-size:12px;color:rgba(255,255,255,0.45)">Kostenlos · Keine Kreditkarte</span>
         </div>
-        <div style="padding:16px;background:var(--surface)">
-          <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Vorschau</div>
-          <div style="background:#fff;border-radius:6px;padding:10px;border:1px solid var(--border)">
-            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-              <div><div style="font-size:10px;font-weight:700">Sanitär Müller GmbH</div><div style="font-size:8px;color:var(--muted)">Musterstraße 12, München</div></div>
-              <div style="font-size:13px;font-weight:700;color:var(--primary)">ANGEBOT</div>
+      </div>
+      <!-- Right: App mockup -->
+      <div class="hero-mockup" style="transform:rotate(-2deg);transform-origin:center center">
+        <div style="background:#fff;border-radius:16px;box-shadow:0 32px 80px rgba(0,0,0,0.45),0 0 0 1px rgba(255,255,255,0.08);overflow:hidden">
+          <div style="background:#1e1b4b;padding:10px 16px;display:flex;align-items:center;gap:8px">
+            <div style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.25)"></div>
+            <div style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.25)"></div>
+            <div style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.25)"></div>
+            <span style="color:rgba(255,255,255,0.4);font-size:11px;margin-left:8px">angebot-now.de</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;min-height:220px">
+            <div style="padding:16px;border-right:1.5px solid #E5E7EB">
+              <div style="font-size:10px;font-weight:600;color:#9CA3AF;text-transform:uppercase;margin-bottom:8px">Absender</div>
+              <div style="background:#F8F9FF;border-radius:6px;padding:8px;margin-bottom:8px">
+                <div style="height:8px;background:#E5E7EB;border-radius:4px;margin-bottom:5px;width:80%"></div>
+                <div style="height:8px;background:#E5E7EB;border-radius:4px;width:60%"></div>
+              </div>
+              <div style="font-size:10px;font-weight:600;color:#9CA3AF;text-transform:uppercase;margin:10px 0 8px">Positionen</div>
+              <div style="border:1.5px solid #E5E7EB;border-radius:6px;overflow:hidden;font-size:10px">
+                <div style="background:#6366F1;color:#fff;padding:5px 8px;display:grid;grid-template-columns:2fr 1fr 1fr;gap:4px"><span>Beschreibung</span><span>Menge</span><span style="text-align:right">GP</span></div>
+                <div style="padding:5px 8px;display:grid;grid-template-columns:2fr 1fr 1fr;gap:4px;border-bottom:1px solid #E5E7EB"><span style="color:#111827">Heizungsanlage</span><span>1 pausch.</span><span style="text-align:right;font-weight:600">2.400 €</span></div>
+                <div style="padding:5px 8px;background:#F8F9FF;display:grid;grid-template-columns:2fr 1fr 1fr;gap:4px"><span style="color:#111827">Heizkörper Montage</span><span>5 Stk.</span><span style="text-align:right;font-weight:600">900 €</span></div>
+              </div>
             </div>
-            <div style="border-top:1.5px solid var(--primary);margin:6px 0"></div>
-            <div style="font-size:8px;color:var(--muted);margin-bottom:6px">Gesamtbetrag</div>
-            <div style="font-size:15px;font-weight:700;color:var(--primary)">3.927,00 €</div>
+            <div style="padding:16px;background:#F8F9FF">
+              <div style="font-size:10px;font-weight:600;color:#9CA3AF;text-transform:uppercase;margin-bottom:8px">Vorschau</div>
+              <div style="background:#fff;border-radius:6px;padding:10px;border:1px solid #E5E7EB">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+                  <div><div style="font-size:10px;font-weight:700">Sanitär Müller GmbH</div><div style="font-size:8px;color:#6B7280">Musterstraße 12, München</div></div>
+                  <div style="font-size:13px;font-weight:700;color:#6366F1">ANGEBOT</div>
+                </div>
+                <div style="border-top:1.5px solid #6366F1;margin:6px 0"></div>
+                <div style="font-size:8px;color:#6B7280;margin-bottom:6px">Gesamtbetrag</div>
+                <div style="font-size:15px;font-weight:700;color:#6366F1">3.927,00 €</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+    </div>
+    <!-- Scroll indicator -->
+    <div style="position:absolute;bottom:28px;left:50%;animation:bounce 1.8s ease-in-out infinite">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>
     </div>
   </section>
 
   <!-- Features -->
   <section style="padding:64px 24px;max-width:900px;margin:0 auto">
-    <h2 style="text-align:center;font-size:28px;font-weight:700;margin-bottom:48px">So einfach geht's</h2>
+    <h2 class="scroll-anim" style="text-align:center;font-size:28px;font-weight:700;margin-bottom:48px">So einfach geht's</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px">
-      <div class="card" style="padding:24px">
+      <div class="card feat-card scroll-anim" data-delay="0" style="padding:24px">
         <div style="font-size:28px;margin-bottom:12px">⚡</div>
         <h3 style="font-size:16px;font-weight:600;margin-bottom:8px">In 2 Minuten fertig</h3>
         <p style="font-size:14px;color:var(--muted);line-height:1.6">Formular ausfüllen, PDF wird live generiert. Kein Word, kein Excel.</p>
       </div>
-      <div class="card" style="padding:24px">
+      <div class="card feat-card scroll-anim" data-delay="100" style="padding:24px">
         <div style="font-size:28px;margin-bottom:12px">📧</div>
         <h3 style="font-size:16px;font-weight:600;margin-bottom:8px">Direkt versenden</h3>
         <p style="font-size:14px;color:var(--muted);line-height:1.6">Angebot geht sofort per E-Mail an deinen Kunden. Mit dir in CC.</p>
       </div>
-      <div class="card" style="padding:24px">
+      <div class="card feat-card scroll-anim" data-delay="200" style="padding:24px">
         <div style="font-size:28px;margin-bottom:12px">🔒</div>
         <h3 style="font-size:16px;font-weight:600;margin-bottom:8px">DSGVO-konform</h3>
         <p style="font-size:14px;color:var(--muted);line-height:1.6">Alle Daten auf EU-Servern. Keine Weitergabe. Kein Tracking.</p>
@@ -202,11 +249,11 @@
   <!-- Pricing -->
   <section style="padding:64px 24px;background:var(--surface)">
     <div style="max-width:680px;margin:0 auto">
-      <h2 style="text-align:center;font-size:28px;font-weight:700;margin-bottom:8px">Einfache Preise</h2>
-      <p style="text-align:center;color:var(--muted);margin-bottom:40px">Starte kostenlos. Upgrade wenn du bereit bist.</p>
+      <h2 class="scroll-anim" style="text-align:center;font-size:28px;font-weight:700;margin-bottom:8px">Einfache Preise</h2>
+      <p class="scroll-anim" data-delay="80" style="text-align:center;color:var(--muted);margin-bottom:40px">Starte kostenlos. Upgrade wenn du bereit bist.</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
         <!-- Free -->
-        <div class="card" style="padding:28px">
+        <div class="card scroll-anim" data-delay="120" style="padding:28px">
           <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px">Kostenlos</div>
           <div style="font-size:32px;font-weight:700;margin-bottom:4px">0 €</div>
           <div style="font-size:13px;color:var(--muted);margin-bottom:20px">5 Angebote kostenlos</div>
@@ -219,21 +266,26 @@
           <button class="btn btn-secondary btn-full" onclick="goToEmailGate()">Kostenlos starten</button>
         </div>
         <!-- Pro -->
-        <div style="position:relative">
+        <div class="scroll-anim" data-delay="220" style="position:relative">
           <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);z-index:1">
-            <span class="pill" style="background:var(--warning);color:#fff;font-size:11px;white-space:nowrap">🔥 Beliebt</span>
+            <span class="pill" style="background:var(--primary);color:#fff;font-size:11px;white-space:nowrap">⭐ Beliebt</span>
           </div>
           <div class="card" style="padding:28px;border-color:var(--primary);border-width:2px;background:linear-gradient(135deg,#F5F3FF,#EEF2FF)">
             <div style="font-size:13px;font-weight:600;color:var(--primary);margin-bottom:8px">Pro</div>
             <div style="font-size:32px;font-weight:700;margin-bottom:4px">39,99 €<span style="font-size:13px;font-weight:400;color:var(--muted)">/Mo</span></div>
-            <div style="font-size:12px;color:var(--muted);margin-bottom:20px">oder 24,99 €/Mo (jährlich)</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:20px">oder 24,92 €/Mo · 299,00 €/Jahr</div>
             <ul style="list-style:none;margin-bottom:24px;display:flex;flex-direction:column;gap:8px">
               <li style="font-size:13px;display:flex;gap:8px;align-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>Unbegrenzte Angebote</li>
               <li style="font-size:13px;display:flex;gap:8px;align-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>Kein Wasserzeichen</li>
               <li style="font-size:13px;display:flex;gap:8px;align-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>Logo hochladen</li>
               <li style="font-size:13px;display:flex;gap:8px;align-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>Vorlagen &amp; Support</li>
             </ul>
-            <button class="btn btn-primary btn-full" onclick="goToEmailGate()">Pro starten</button>
+            <button class="btn btn-primary btn-full" onclick="goToEmailGate()" style="position:relative;overflow:hidden"
+              onmouseover="this.querySelector('.shimmer').style.animation='shimmer 1.2s infinite'"
+              onmouseout="this.querySelector('.shimmer').style.animation='none'">
+              Pro starten
+              <div class="shimmer" style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.22) 50%,transparent 100%);background-size:200% 100%;animation:none;pointer-events:none"></div>
+            </button>
           </div>
         </div>
       </div>
@@ -425,6 +477,27 @@
         </div>
       </section>
 
+      <!-- Unterschrift -->
+      <section style="margin-top:20px;animation:fadeUp 0.4s 0.28s ease both;opacity:0;animation-fill-mode:forwards">
+        <h3 style="font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;display:flex;align-items:center;gap:6px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Unterschrift
+        </h3>
+        <div class="card" style="padding:16px">
+          <div style="position:relative">
+            <canvas id="sig-canvas" style="width:100%;height:150px;background:#fff;border:1.5px solid var(--border);border-radius:8px;cursor:crosshair;display:block;touch-action:none"></canvas>
+            <div id="sig-placeholder" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;color:#D1D5DB;font-size:14px">Hier unterschreiben</div>
+          </div>
+          <div id="sig-err" style="color:var(--danger);font-size:12px;margin-top:6px;display:none">Bitte unterschreiben Sie das Angebot.</div>
+          <div style="margin-top:10px">
+            <button class="btn btn-secondary" onclick="clearSignature()" style="font-size:12px;padding:6px 14px">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+              Löschen
+            </button>
+          </div>
+        </div>
+      </section>
+
       <!-- Promo Code -->
       <section style="margin-top:16px;animation:fadeUp 0.4s 0.3s ease both;opacity:0;animation-fill-mode:forwards">
         <div class="card" style="padding:14px 16px">
@@ -509,12 +582,12 @@
         <!-- Yearly (highlighted) -->
         <div style="position:relative;animation:fadeUp 0.4s 0.1s ease both;opacity:0;animation-fill-mode:forwards">
           <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);z-index:1">
-            <span class="pill" style="background:var(--warning);color:#fff;font-size:11px;white-space:nowrap">🔥 Beliebt</span>
+            <span class="pill" style="background:var(--primary);color:#fff;font-size:11px;white-space:nowrap">⭐ Beliebt</span>
           </div>
           <div class="card" style="padding:20px;border-color:var(--primary);border-width:2px;background:linear-gradient(135deg,#F5F3FF,#EEF2FF)">
             <div style="font-size:13px;font-weight:600;color:var(--primary);margin-bottom:8px">Jährlich</div>
-            <div style="font-size:28px;font-weight:700;color:var(--text)">24,99 €<span style="font-size:13px;font-weight:400;color:var(--muted)">/Monat</span></div>
-            <div style="font-size:12px;color:var(--muted);margin-top:2px">299,88 € / Jahr · <span style="color:var(--success);font-weight:600">38% sparen</span></div>
+            <div style="font-size:28px;font-weight:700;color:var(--text)">24,92 €<span style="font-size:13px;font-weight:400;color:var(--muted)">/Monat</span></div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">299,00 € / Jahr · <span style="color:var(--success);font-weight:600">37% sparen</span></div>
             <button class="btn btn-primary btn-full" id="yearly-btn" style="margin-top:16px;font-size:13px;position:relative;overflow:hidden" onclick="startCheckout('yearly')">
               <span style="position:relative;z-index:1">Jährlich wählen</span>
               <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.2) 50%,transparent 100%);background-size:200% 100%;animation:shimmer 2.5s infinite"></div>
@@ -1122,6 +1195,31 @@ function buildPDF() {
     y += 5;
   }
 
+  // Signature
+  const sigDataUrl = getSignatureDataUrl ? getSignatureDataUrl() : null;
+  if (sigDataUrl) {
+    y += 4;
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.3);
+    doc.line(margin, y, margin + 60, y);
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(107, 114, 128);
+    doc.text('Unterschrift Auftragnehmer:', margin, y);
+    doc.text('Datum: ' + formatDateDE(getTodayISO()), colRight, y, { align: 'right' });
+    y += 3;
+    try {
+      const imgProps = doc.getImageProperties(sigDataUrl);
+      const aspect = imgProps.width / imgProps.height;
+      let sigW = Math.min(50, aspect * 14);
+      let sigH = sigW / aspect;
+      if (sigH > 14) { sigH = 14; sigW = sigH * aspect; }
+      doc.addImage(sigDataUrl, 'PNG', margin, y, sigW, sigH);
+      y += sigH + 4;
+    } catch (_) {}
+  }
+
   // Footer
   if (!state.isPro) {
     const pageH = 297;
@@ -1243,6 +1341,7 @@ function handleEmailGate() {
   }
 
   showView('view-generator');
+  setTimeout(initSignatureCanvas, 60);
   updateCounter();
   generatePreview();
 }
@@ -1294,6 +1393,14 @@ async function handleSendQuote() {
     return;
   }
   if (!f.rName) { alert('Bitte geben Sie einen Kundennamen ein.'); return; }
+
+  // Signature required
+  if (!hasSignature()) {
+    const se = document.getElementById('sig-err');
+    if (se) { se.style.display = 'block'; se.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    return;
+  }
+  const seOk = document.getElementById('sig-err'); if (seOk) seOk.style.display = 'none';
 
   // Show confirmation modal (FIX 7)
   const modal = document.getElementById('modal-confirm-send');
@@ -1481,6 +1588,101 @@ function applyMobileLayout() {
   }
 }
 document.addEventListener('DOMContentLoaded', applyMobileLayout);
+</script>
+<script>
+// ─── DIGITAL SIGNATURE ────────────────────────────────────────────────────────
+var _sigCanvas, _sigCtx, _sigDrawing = false, _sigHas = false, _sigInited = false;
+
+function initSignatureCanvas() {
+  _sigCanvas = document.getElementById('sig-canvas');
+  if (!_sigCanvas) return;
+  var dpr = window.devicePixelRatio || 1;
+  var w = _sigCanvas.offsetWidth || 560;
+  _sigCanvas.width = Math.max(w, 100) * dpr;
+  _sigCanvas.height = 150 * dpr;
+  _sigCtx = _sigCanvas.getContext('2d');
+  _sigCtx.scale(dpr, dpr);
+  _sigCtx.strokeStyle = '#111827';
+  _sigCtx.lineWidth = 2.5;
+  _sigCtx.lineCap = 'round';
+  _sigCtx.lineJoin = 'round';
+  if (_sigInited) return;
+  _sigInited = true;
+  _sigCanvas.addEventListener('mousedown', _sigStart);
+  _sigCanvas.addEventListener('mousemove', _sigMove);
+  _sigCanvas.addEventListener('mouseup', _sigEnd);
+  _sigCanvas.addEventListener('mouseleave', _sigEnd);
+  _sigCanvas.addEventListener('touchstart', function(e) { e.preventDefault(); _sigStart(e.touches[0]); }, { passive: false });
+  _sigCanvas.addEventListener('touchmove', function(e) { e.preventDefault(); _sigMove(e.touches[0]); }, { passive: false });
+  _sigCanvas.addEventListener('touchend', _sigEnd, { passive: false });
+}
+
+function _sigGetPos(e) {
+  var r = _sigCanvas.getBoundingClientRect();
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+function _sigStart(e) {
+  _sigDrawing = true;
+  var p = _sigGetPos(e);
+  _sigCtx.beginPath();
+  _sigCtx.moveTo(p.x, p.y);
+  if (!_sigHas) {
+    _sigHas = true;
+    var ph = document.getElementById('sig-placeholder');
+    if (ph) ph.style.display = 'none';
+    var se = document.getElementById('sig-err');
+    if (se) se.style.display = 'none';
+  }
+}
+function _sigMove(e) {
+  if (!_sigDrawing) return;
+  var p = _sigGetPos(e);
+  _sigCtx.lineTo(p.x, p.y);
+  _sigCtx.stroke();
+}
+function _sigEnd() { _sigDrawing = false; }
+
+function clearSignature() {
+  if (!_sigCtx) return;
+  _sigCtx.clearRect(0, 0, _sigCanvas.width, _sigCanvas.height);
+  _sigHas = false;
+  var ph = document.getElementById('sig-placeholder');
+  if (ph) ph.style.display = 'flex';
+}
+function hasSignature() { return _sigHas; }
+function getSignatureDataUrl() {
+  if (!_sigHas || !_sigCanvas) return null;
+  return _sigCanvas.toDataURL('image/png');
+}
+
+// ─── INTERSECTION OBSERVER (scroll animations) ────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  var io = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        var el = entry.target;
+        el.style.transitionDelay = (el.dataset.delay || 0) + 'ms';
+        el.classList.add('visible');
+        io.unobserve(el);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.scroll-anim').forEach(function(el) { io.observe(el); });
+
+  // Navbar scroll behaviour
+  var nav = document.getElementById('landing-nav');
+  if (nav) {
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > 20) {
+        nav.style.boxShadow = '0 2px 20px rgba(99,102,241,0.10)';
+        nav.style.borderBottomColor = 'rgba(99,102,241,0.18)';
+      } else {
+        nav.style.boxShadow = 'none';
+        nav.style.borderBottomColor = 'var(--border)';
+      }
+    }, { passive: true });
+  }
+});
 </script>
 </body>
 </html>
