@@ -3,11 +3,11 @@
 
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'https://angebotgo.de';
 
-// Also accept the Netlify preview domain during development
+// Also accept the Netlify subdomain and optional preview origin
 const EXTRA_ORIGINS = new Set([
   ALLOWED_ORIGIN,
-  process.env.NETLIFY_PREVIEW_ORIGIN || '',
   'https://angebotgo.netlify.app',
+  process.env.NETLIFY_PREVIEW_ORIGIN || '',
 ].filter(Boolean));
 
 function getCorsOrigin(event) {
