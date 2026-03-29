@@ -1510,6 +1510,18 @@ function getSignatureDataUrl() {
   return _sigCanvas.toDataURL('image/png');
 }
 
+// ─── HOW-IT-WORKS STEPPER ─────────────────────────────────────────────────────
+function showStep(n) {
+  for (let i = 1; i <= 3; i++) {
+    const content = document.getElementById('step-content-' + i);
+    const btn = document.getElementById('step-btn-' + i);
+    if (content) content.style.display = i === n ? '' : 'none';
+    if (btn) {
+      btn.classList.toggle('step-active', i === n);
+    }
+  }
+}
+
 // ─── INTERSECTION OBSERVER (scroll animations) ────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
   var io = new IntersectionObserver(function(entries) {
