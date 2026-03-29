@@ -339,20 +339,20 @@
               <div style="height:2px;background:var(--primary);margin-bottom:10px;border-radius:1px"></div>
               <!-- Table header -->
               <div style="display:grid;grid-template-columns:3fr 1fr 1fr 1fr;gap:4px;background:var(--primary);color:#fff;font-size:9px;font-weight:600;padding:5px 6px;border-radius:4px;margin-bottom:4px">
-                <span>Beschreibung</span><span style="text-align:right">Menge</span><span style="text-align:right">EP</span><span style="text-align:right">GP</span>
+                <span>Beschreibung</span><span style="text-align:right">Menge</span><span style="text-align:right">EP</span><span style="text-align:right">Gesamt</span>
               </div>
               <!-- Rows -->
               <div style="display:grid;grid-template-columns:3fr 1fr 1fr 1fr;gap:4px;font-size:9px;padding:4px 6px;color:var(--text);border-bottom:1px solid var(--border)">
-                <span>Heizungsanlage erneuern</span><span style="text-align:right">1 p.</span><span style="text-align:right">2.400 €</span><span style="text-align:right;font-weight:600">2.400 €</span>
+                <span>Heizungsanlage erneuern</span><span style="text-align:right">1 p.</span><span style="text-align:right;white-space:nowrap">2.400 €</span><span style="text-align:right;font-weight:600;white-space:nowrap">2.400 €</span>
               </div>
               <div style="display:grid;grid-template-columns:3fr 1fr 1fr 1fr;gap:4px;font-size:9px;padding:4px 6px;background:#F8F9FF;color:var(--text);border-bottom:1px solid var(--border)">
-                <span>Heizkörper montieren</span><span style="text-align:right">5 Stk.</span><span style="text-align:right">180 €</span><span style="text-align:right;font-weight:600">900 €</span>
+                <span>Heizkörper montieren</span><span style="text-align:right">5 Stk.</span><span style="text-align:right;white-space:nowrap">180 €</span><span style="text-align:right;font-weight:600;white-space:nowrap">900 €</span>
               </div>
               <!-- Totals -->
               <div style="margin-top:10px;display:flex;flex-direction:column;align-items:flex-end;gap:3px;font-size:10px">
-                <div style="display:flex;gap:20px;color:var(--muted)"><span>Zwischensumme</span><span>3.300,00 €</span></div>
-                <div style="display:flex;gap:20px;color:var(--muted)"><span>MwSt. (19%)</span><span>627,00 €</span></div>
-                <div style="display:flex;gap:20px;color:var(--primary);font-weight:700;font-size:12px;border-top:1.5px solid var(--primary);padding-top:5px;margin-top:2px"><span>Gesamt</span><span>3.927,00 €</span></div>
+                <div style="display:flex;gap:20px;color:var(--muted)"><span>Zwischensumme</span><span style="white-space:nowrap">3.300,00 €</span></div>
+                <div style="display:flex;gap:20px;color:var(--muted)"><span>MwSt. (19%)</span><span style="white-space:nowrap">627,00 €</span></div>
+                <div style="display:flex;gap:20px;color:var(--primary);font-weight:700;font-size:12px;border-top:1.5px solid var(--primary);padding-top:5px;margin-top:2px"><span>Gesamt</span><span style="white-space:nowrap">3.927,00 €</span></div>
               </div>
               <!-- Footer note -->
               <div style="margin-top:12px;font-size:9px;color:var(--muted);border-top:1px solid var(--border);padding-top:8px">Zahlungsziel: 30 Tage netto · Erstellt mit AngebotGo</div>
@@ -370,7 +370,7 @@
     <div style="max-width:720px;margin:0 auto">
       <h2 class="scroll-anim" style="font-size:clamp(28px,3.5vw,40px);font-weight:700;text-align:center;margin-bottom:12px">Einfache Preise</h2>
       <p class="scroll-anim" data-delay="60" style="text-align:center;color:var(--muted);font-size:16px;margin-bottom:52px">Starte kostenlos. Upgrade, wenn du regelmäßig Angebote schreibst.</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="pricing-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
         <!-- Free -->
         <div class="scroll-anim card" data-delay="80" style="padding:32px;border-radius:20px">
           <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px">Kostenlos</div>
@@ -624,8 +624,8 @@
                 <th style="text-align:left;font-size:11px;font-weight:600;color:var(--muted);padding:6px 4px">Beschreibung</th>
                 <th style="text-align:right;font-size:11px;font-weight:600;color:var(--muted);padding:6px 4px;width:60px">Menge</th>
                 <th style="text-align:left;font-size:11px;font-weight:600;color:var(--muted);padding:6px 4px;width:70px">Einheit</th>
-                <th style="text-align:right;font-size:11px;font-weight:600;color:var(--muted);padding:6px 4px;width:90px">EP (€)</th>
-                <th style="text-align:right;font-size:11px;font-weight:600;color:var(--muted);padding:6px 4px;width:90px">GP (€)</th>
+                <th style="text-align:right;font-size:11px;font-weight:600;color:var(--muted);padding:6px 4px;width:100px">Einzelpreis</th>
+                <th style="text-align:right;font-size:11px;font-weight:600;color:var(--muted);padding:6px 4px;width:100px">Gesamt</th>
                 <th style="width:28px"></th>
               </tr>
             </thead>
