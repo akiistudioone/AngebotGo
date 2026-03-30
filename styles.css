@@ -107,6 +107,16 @@
       50% { transform: translateX(-50%) translateY(8px); }
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+    /* ── Fix: iOS Safari zoom verschiebt fixed nav ── */
+    #landing-nav,
+    #help-widget,
+    #feedback-banner,
+    #app-toast {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+      will-change: transform;
+    }
+
     /* ── Step mockup shared styles ── */
     .smock-wrap { background:rgba(255,255,255,0.06);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.12);border-radius:16px;overflow:hidden; }
     .smock-chrome { background:rgba(0,0,0,0.28);padding:9px 14px;display:flex;align-items:center;gap:6px;border-bottom:1px solid rgba(255,255,255,0.07); }
@@ -179,10 +189,27 @@
       .kpi-glass-grid { grid-template-columns: 1fr !important; }
       .pricing-grid { grid-template-columns: 1fr !important; max-width: 380px; margin-left: auto !important; margin-right: auto !important; }
       #landing-nav { padding: 0 16px !important; }
-      #landing-cta-btn { padding: 8px 16px !important; font-size: 13px !important; }
+      /* Landing nav: kompakter auf Mobile */
+      #landing-nav { padding: 0 16px !important; }
+      /* CTA-Button in der Nav auf Mobile ausblenden – Hero hat eigene CTAs */
+      #landing-cta-btn { display: none !important; }
+      /* Nav-Links etwas kleiner */
+      #nav-link-generator, #nav-link-login { font-size: 13px !important; }
+      /* Hero-Sektion: weniger Padding */
+      section[style*="min-height:100vh"] { padding-left: 20px !important; padding-right: 20px !important; padding-top: 90px !important; }
+      /* Hero-CTAs: volle Breite, untereinander */
+      section[style*="min-height:100vh"] div[style*="display:flex;gap:14px"] { flex-direction: column !important; align-items: stretch !important; }
+      section[style*="min-height:100vh"] div[style*="display:flex;gap:14px"] button,
+      section[style*="min-height:100vh"] div[style*="display:flex;gap:14px"] a { text-align: center !important; justify-content: center !important; }
       section[style*="padding:120px 48px"],
       section[style*="padding:100px 48px"],
-      section[style*="padding:80px 48px"] { padding-left: 20px !important; padding-right: 20px !important; }
+      section[style*="padding:80px 48px"] { padding-left: 20px !important; padding-right: 20px !important; padding-top: 64px !important; padding-bottom: 64px !important; }
+      /* Help widget + Feedback-Banner: nicht über mobile Browser-UI */
+      #help-widget { bottom: 16px !important; right: 16px !important; }
+      #feedback-banner { bottom: 80px !important; right: 12px !important; width: calc(100vw - 24px) !important; }
+      /* Step mockup: kleinere Schrift auf sehr engen Screens */
+      .smock-card { padding: 14px 12px !important; }
+      .smock-desc { flex-direction: column !important; gap: 10px !important; }
       /* Generator form padding on mobile */
       #form-panel { padding: 16px !important; }
       /* Auth view card padding */

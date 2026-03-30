@@ -22,7 +22,7 @@ const state = {
 const FREE_LIMIT = 5;
 const FEATURES = [
   'Unbegrenzte Angebote',
-  'Kein Wasserzeichen',
+  'Firmendaten gespeichert',
   'Logo hochladen',
   'E-Mail direkt versenden',
   'Angebots-Vorlagen',
@@ -344,9 +344,7 @@ function generatePreview() {
   const netto = state.positions.reduce((s, p) => s + p.qty * p.ep, 0);
   const vatAmt = netto * (state.vatRate / 100);
   const total = netto + vatAmt;
-  const watermark = !state.isPro
-    ? `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:36px;font-weight:700;color:rgba(99,102,241,0.06);white-space:nowrap;pointer-events:none;z-index:0;user-select:none">AngebotGo</div>`
-    : '';
+  const watermark = '';
 
   const rows = state.positions.map((p, i) => `
     <tr style="background:${i % 2 === 0 ? '#fff' : '#F8F9FF'}">
@@ -636,26 +634,6 @@ function buildPDF() {
     y += 18;
   }
 
-  // Diagonal watermark + footer for free users
-  if (!state.isPro) {
-    const GState = window.jspdf && window.jspdf.GState ? window.jspdf.GState : null;
-    if (GState) {
-      doc.saveGraphicsState();
-      doc.setGState(new GState({ opacity: 0.07 }));
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(52);
-      doc.setTextColor(99, 102, 241);
-      doc.text('AngebotGo', pageW / 2, 297 / 2, { align: 'center', angle: 30 });
-      doc.restoreGraphicsState();
-    }
-    const pageH = 297;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(156, 163, 175);
-    const footerText = 'Erstellt mit AngebotGo';
-    const footerTextW = doc.getTextWidth(footerText);
-    doc.textWithLink(footerText, (pageW - footerTextW) / 2, pageH - 10, { url: 'https://angebotgo.de' });
-  }
 
   return doc;
 }
@@ -688,6 +666,9 @@ async function goToEmailGate(pending) {
   if (pendingMsg) {
     if (pending === 'send') {
       pendingMsg.textContent = 'Bitte melde dich an, um dein Angebot zu senden.';
+      pendingMsg.style.display = 'block';
+    } else if (pending && pending.startsWith('checkout:')) {
+      pendingMsg.textContent = 'Bitte melde dich an, um Pro zu aktivieren.';
       pendingMsg.style.display = 'block';
     } else {
       pendingMsg.style.display = 'none';
@@ -977,9 +958,15 @@ async function initAfterLogin(session) {
 
   const pending = state.pendingAction;
   state.pendingAction = null;
-  goToGenerator();
-  if (pending === 'send') {
-    setTimeout(() => handleSendQuote(), 150);
+  if (pending && pending.startsWith('checkout:')) {
+    const plan = pending.split(':')[1];
+    goToGenerator();
+    setTimeout(() => startCheckout(plan), 150);
+  } else {
+    goToGenerator();
+    if (pending === 'send') {
+      setTimeout(() => handleSendQuote(), 150);
+    }
   }
 }
 
@@ -1326,9 +1313,12 @@ async function trackQuote() {
 
 // ─── STRIPE CHECKOUT ──────────────────────────────────────────────────────────
 async function startCheckout(plan) {
+  if (!state.accessToken) {
+    await goToEmailGate('checkout:' + plan);
+    return;
+  }
   try {
-    const headers = { 'Content-Type': 'application/json' };
-    if (state.accessToken) headers['Authorization'] = `Bearer ${state.accessToken}`;
+    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.accessToken}` };
     const res = await fetch('/.netlify/functions/create-checkout', {
       method: 'POST',
       headers,
@@ -1338,10 +1328,10 @@ async function startCheckout(plan) {
     if (data.url) {
       window.location.href = data.url;
     } else {
-      showAlert('Fehler beim Starten des Bezahlvorgangs. Bitte versuchen Sie es erneut.');
+      showAlert('Fehler beim Starten des Bezahlvorgangs. Bitte versuche es erneut.');
     }
   } catch {
-    showAlert('Netzwerkfehler. Bitte versuchen Sie es erneut.');
+    showAlert('Netzwerkfehler. Bitte versuche es erneut.');
   }
 }
 
