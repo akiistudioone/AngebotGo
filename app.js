@@ -879,6 +879,7 @@ async function restoreSession(session) {
     if (typeof data.quote_count === 'number') state.quoteCount = data.quote_count;
     if (typeof data.bonus_quotes === 'number') state.bonusQuotes = data.bonus_quotes;
     if (data.is_pro === true) applyProStatus();
+    else updateCounter();
     if (data.profile) loadProfileFromServer(data.profile);
   }).catch(() => {});
 }
