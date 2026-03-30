@@ -1056,6 +1056,7 @@ function showSuccess() {
   setTimeout(() => {
     el.style.display = 'none';
     el.classList.remove('active');
+    showFeedbackBanner();
   }, 2500);
 }
 
@@ -1650,3 +1651,227 @@ document.addEventListener('DOMContentLoaded', function() {
     _updateNav();
   }
 });
+
+
+// ─── HELP WIDGET ──────────────────────────────────────────────────────────────
+
+const HELP_FAQS = [
+  {
+    q: 'Wie viele kostenlose Angebote habe ich?',
+    a: 'Im kostenlosen Tarif kannst du bis zu 5 Angebote erstellen und versenden. Mit einem Promo-Code lässt sich dieses Kontingent erhöhen. Für unbegrenzte Angebote steht der Pro-Tarif zur Verfügung.',
+  },
+  {
+    q: 'Wie sende ich ein Angebot per E-Mail?',
+    a: 'Fülle alle Pflichtfelder aus (Firmendaten, Kundendaten, Positionen), unterschreibe im Unterschriftsfeld und klicke auf „Angebot senden". Du musst eingeloggt sein – falls noch nicht, wirst du kurz zur Anmeldung weitergeleitet.',
+  },
+  {
+    q: 'Mein Angebot ist nicht angekommen – was tun?',
+    a: 'Bitte prüfe zunächst den Spam-/Junk-Ordner des Empfängers. Stelle sicher, dass die Absender-E-Mail-Adresse korrekt eingetragen ist. Wenn das Problem weiterhin besteht, kontaktiere uns über das Kontaktformular.',
+  },
+  {
+    q: 'Wie speichere ich meine Firmendaten dauerhaft?',
+    a: 'Das Speichern der Firmendaten ist eine Pro-Funktion. Gehe zu „Mein Profil", trage deine Daten ein und klicke auf „Speichern". Beim nächsten Login werden sie automatisch geladen.',
+  },
+  {
+    q: 'Wie upgrade ich auf Pro?',
+    a: 'Klicke auf „Auf Pro upgraden" im Profil oder direkt auf den Pro-Button im Generator. Du wirst zu Stripe weitergeleitet und kannst sicher per Kreditkarte oder SEPA bezahlen. Das Upgrade ist sofort aktiv.',
+  },
+  {
+    q: 'Wie kündige ich mein Pro-Abo?',
+    a: 'Gehe zu „Mein Profil" und klicke auf „Abo über Stripe verwalten / kündigen". Dort findest du alle Optionen zum Verwalten oder Kündigen deines Abonnements. Gekündigte Abos laufen bis zum Ende der bezahlten Periode weiter.',
+  },
+  {
+    q: 'Kann ich das Angebot als PDF herunterladen?',
+    a: 'Ja. Im Generator gibt es einen „PDF herunterladen"-Button. So kannst du das Angebot auch ausdrucken oder direkt an den Kunden übergeben.',
+  },
+  {
+    q: 'Was ist ein Promo-Code?',
+    a: 'Promo-Codes schalten zusätzliche kostenlose Angebote frei, ohne dass ein Pro-Abo nötig ist. Du kannst einen Code im Profil unter „Promo-Code einlösen" eingeben.',
+  },
+];
+
+function buildFaqList() {
+  const list = document.getElementById('help-faq-list');
+  if (!list) return;
+  list.innerHTML = HELP_FAQS.map((faq, i) => `
+    <button onclick="showHelpAnswer(${i})"
+      style="width:100%;padding:11px 16px;background:none;border:none;border-bottom:1px solid #F3F4F6;cursor:pointer;text-align:left;font-size:13px;color:#374151;font-family:inherit;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:background 0.12s"
+      onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='none'">
+      <span>${sanitizeDisplay(faq.q)}</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><polyline points="9,18 15,12 9,6"/></svg>
+    </button>
+  `).join('');
+}
+
+function toggleHelp() {
+  const panel = document.getElementById('help-panel');
+  const iconOpen = document.getElementById('help-icon-open');
+  const iconClose = document.getElementById('help-icon-close');
+  const isOpen = panel.style.display !== 'none';
+  if (isOpen) {
+    panel.style.display = 'none';
+    if (iconOpen) iconOpen.style.display = '';
+    if (iconClose) iconClose.style.display = 'none';
+  } else {
+    panel.style.display = 'block';
+    panel.style.animation = 'none';
+    void panel.offsetWidth;
+    panel.style.animation = 'helpSlide 0.25s cubic-bezier(0.16,1,0.3,1) both';
+    showHelpSection('help-home');
+    if (iconOpen) iconOpen.style.display = 'none';
+    if (iconClose) iconClose.style.display = '';
+    buildFaqList();
+  }
+}
+
+function showHelpSection(id) {
+  ['help-home', 'help-answer', 'help-contact'].forEach(s => {
+    const el = document.getElementById(s);
+    if (el) el.style.display = s === id ? '' : 'none';
+  });
+  if (id === 'help-contact' && state.email) {
+    const emailInput = document.getElementById('help-email');
+    if (emailInput && !emailInput.value) emailInput.value = state.email;
+  }
+}
+
+function showHelpAnswer(idx) {
+  const faq = HELP_FAQS[idx];
+  if (!faq) return;
+  document.getElementById('help-answer-q').textContent = faq.q;
+  document.getElementById('help-answer-a').textContent = faq.a;
+  showHelpSection('help-answer');
+}
+
+function helpAnswerFeedback(helpful) {
+  if (helpful) {
+    const qEl = document.getElementById('help-answer-q');
+    const aEl = document.getElementById('help-answer-a');
+    if (qEl) qEl.textContent = 'Super, freut uns! 🎉';
+    if (aEl) aEl.textContent = 'Danke für dein Feedback. Melde dich jederzeit, wenn du weitere Fragen hast.';
+  } else {
+    showHelpSection('help-contact');
+    const emailInput = document.getElementById('help-email');
+    if (emailInput && state.email && !emailInput.value) emailInput.value = state.email;
+  }
+}
+
+async function submitSupportRequest() {
+  const btn = document.getElementById('help-submit-btn');
+  const msg = document.getElementById('help-contact-msg');
+  const name = (document.getElementById('help-name').value || '').trim();
+  const email = (document.getElementById('help-email').value || '').trim();
+  const category = document.getElementById('help-category').value;
+  const message = (document.getElementById('help-message').value || '').trim();
+
+  if (!name || !email || !message) {
+    msg.textContent = 'Bitte Name, E-Mail und Nachricht ausfüllen.';
+    msg.style.color = '#EF4444';
+    msg.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Wird gesendet…';
+  msg.style.display = 'none';
+
+  try {
+    const res = await fetch('/.netlify/functions/submit-support', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, category: category || 'Sonstiges', message }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.error || 'Fehler');
+    msg.textContent = '✓ Nachricht gesendet! Wir melden uns bald.';
+    msg.style.color = '#059669';
+    msg.style.display = 'block';
+    document.getElementById('help-name').value = '';
+    document.getElementById('help-message').value = '';
+    document.getElementById('help-category').value = '';
+    btn.textContent = 'Gesendet ✓';
+  } catch (e) {
+    msg.textContent = 'Fehler beim Senden. Bitte versuche es erneut.';
+    msg.style.color = '#EF4444';
+    msg.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Senden';
+  }
+}
+
+
+// ─── FEEDBACK SYSTEM ─────────────────────────────────────────────────────────
+
+let _sendRating = 0;
+let _profileRating = 0;
+
+function showFeedbackBanner() {
+  const banner = document.getElementById('feedback-banner');
+  if (!banner) return;
+  _sendRating = 0;
+  document.querySelectorAll('.srating-btn').forEach(b => b.classList.remove('selected'));
+  const wrap = document.getElementById('fb-text-wrap');
+  if (wrap) wrap.style.display = 'none';
+  const fbText = document.getElementById('fb-text');
+  if (fbText) fbText.value = '';
+  banner.style.display = 'block';
+}
+
+function closeFeedbackBanner() {
+  const banner = document.getElementById('feedback-banner');
+  if (banner) banner.style.display = 'none';
+}
+
+function selectSendRating(val) {
+  _sendRating = val;
+  document.querySelectorAll('.srating-btn').forEach(b => {
+    b.classList.toggle('selected', parseInt(b.dataset.v) === val);
+  });
+  const wrap = document.getElementById('fb-text-wrap');
+  if (wrap) wrap.style.display = '';
+}
+
+async function submitSendFeedback() {
+  if (!_sendRating) return;
+  const text = (document.getElementById('fb-text').value || '').trim();
+  closeFeedbackBanner();
+  try {
+    await fetch('/.netlify/functions/submit-feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rating: _sendRating, text, context: 'send', email: state.email }),
+    });
+  } catch {}
+  showToast('Danke für dein Feedback! 🙏');
+}
+
+function selectProfileRating(val) {
+  _profileRating = val;
+  document.querySelectorAll('.prating-btn').forEach(b => {
+    b.classList.toggle('selected', parseInt(b.dataset.r) === val);
+  });
+  const btn = document.getElementById('profile-feedback-btn');
+  if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer'; }
+}
+
+async function submitProfileFeedback() {
+  if (!_profileRating) return;
+  const text = (document.getElementById('profile-feedback-text').value || '').trim();
+  const btn = document.getElementById('profile-feedback-btn');
+  const msg = document.getElementById('profile-feedback-msg');
+  if (btn) { btn.disabled = true; btn.textContent = 'Wird gesendet…'; }
+  try {
+    await fetch('/.netlify/functions/submit-feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rating: _profileRating, text, context: 'profile', email: state.email }),
+    });
+    if (msg) { msg.textContent = 'Vielen Dank für dein Feedback! 🙏'; msg.style.display = 'block'; }
+    if (btn) btn.style.display = 'none';
+    document.querySelectorAll('.prating-btn').forEach(b => { b.disabled = true; b.style.opacity = '0.5'; });
+    document.getElementById('profile-feedback-text').disabled = true;
+  } catch {
+    if (btn) { btn.disabled = false; btn.textContent = 'Feedback senden'; btn.style.opacity = '1'; }
+    showToast('⚠ Fehler beim Senden. Bitte versuche es erneut.');
+  }
+}

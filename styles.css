@@ -107,6 +107,18 @@
       50% { transform: translateX(-50%) translateY(8px); }
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes helpSlide {
+      from { opacity: 0; transform: translateY(12px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes bannerSlide {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    #feedback-banner { animation: bannerSlide 0.3s cubic-bezier(0.16,1,0.3,1) both; }
+    .srating-btn:hover, .prating-btn:hover { transform: scale(1.15); border-color: #6366F1 !important; }
+    .srating-btn.selected { border-color: #6366F1 !important; background: #EEF2FF !important; transform: scale(1.12); }
+    .prating-btn.selected { border-color: var(--primary) !important; background: #EEF2FF !important; }
     .feat-card {
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }

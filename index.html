@@ -1073,12 +1073,159 @@
       </div>
     </div>
 
-    <!-- Sign out -->
+    <!-- Promo code -->
     <div style="text-align:center;padding-bottom:32px">
       <button onclick="signOut()" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline">Abmelden</button>
     </div>
 
+    <!-- Feedback -->
+    <div class="card" style="padding:20px 24px;margin-bottom:20px">
+      <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">Feedback geben</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5">Hilf uns, AngebotGo zu verbessern. Was denkst du?</p>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <button onclick="selectProfileRating(1)" data-r="1" class="prating-btn" style="flex:1;padding:8px 4px;border:1.5px solid var(--border);border-radius:10px;background:none;cursor:pointer;font-size:20px;transition:all 0.15s">😞</button>
+        <button onclick="selectProfileRating(2)" data-r="2" class="prating-btn" style="flex:1;padding:8px 4px;border:1.5px solid var(--border);border-radius:10px;background:none;cursor:pointer;font-size:20px;transition:all 0.15s">😐</button>
+        <button onclick="selectProfileRating(3)" data-r="3" class="prating-btn" style="flex:1;padding:8px 4px;border:1.5px solid var(--border);border-radius:10px;background:none;cursor:pointer;font-size:20px;transition:all 0.15s">🙂</button>
+        <button onclick="selectProfileRating(4)" data-r="4" class="prating-btn" style="flex:1;padding:8px 4px;border:1.5px solid var(--border);border-radius:10px;background:none;cursor:pointer;font-size:20px;transition:all 0.15s">😊</button>
+        <button onclick="selectProfileRating(5)" data-r="5" class="prating-btn" style="flex:1;padding:8px 4px;border:1.5px solid var(--border);border-radius:10px;background:none;cursor:pointer;font-size:20px;transition:all 0.15s">🤩</button>
+      </div>
+      <textarea id="profile-feedback-text" placeholder="Was können wir verbessern? (optional)" rows="3"
+        style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:var(--font);color:var(--text);resize:vertical;outline:none;box-sizing:border-box;transition:border-color 0.15s"
+        onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      <button id="profile-feedback-btn" onclick="submitProfileFeedback()" class="btn btn-secondary btn-full" style="margin-top:10px;font-size:13px;opacity:0.5;cursor:not-allowed" disabled>Feedback senden</button>
+      <div id="profile-feedback-msg" style="display:none;margin-top:10px;font-size:13px;text-align:center;color:var(--success);font-weight:500"></div>
+    </div>
+
+    <!-- Sign out -->
+
   </div>
+</div>
+
+<!-- ─── FEEDBACK BANNER (nach Angebots-Versand) ──────────────────────────── -->
+<div id="feedback-banner" style="display:none;position:fixed;bottom:90px;right:24px;width:300px;background:#fff;border-radius:18px;box-shadow:0 8px 40px rgba(0,0,0,0.14);padding:18px 20px;z-index:1400">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+    <div>
+      <div style="font-size:14px;font-weight:600;color:#111827;margin-bottom:2px">Wie war die Erfahrung?</div>
+      <div style="font-size:12px;color:#9CA3AF">Nur 2 Sekunden deiner Zeit 🙏</div>
+    </div>
+    <button onclick="closeFeedbackBanner()" style="background:none;border:none;color:#9CA3AF;cursor:pointer;font-size:20px;line-height:1;padding:0;margin-left:8px">&times;</button>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:12px">
+    <button onclick="selectSendRating(1)" data-v="1" class="srating-btn" style="flex:1;padding:8px 4px;border:1.5px solid #E5E7EB;border-radius:10px;background:none;cursor:pointer;font-size:20px;transition:all 0.15s">😞</button>
+    <button onclick="selectSendRating(2)" data-v="2" class="srating-btn" style="flex:1;padding:8px 4px;border:1.5px solid #E5E7EB;border-radius:10px;background:none;cursor:pointer;font-size:20px;transition:all 0.15s">😐</button>
+    <button onclick="selectSendRating(3)" data-v="3" class="srating-btn" style="flex:1;padding:8px 4px;border:1.5px solid #E5E7EB;border-radius:10px;background:none;cursor:pointer;font-size:20px;transition:all 0.15s">🙂</button>
+    <button onclick="selectSendRating(4)" data-v="4" class="srating-btn" style="flex:1;padding:8px 4px;border:1.5px solid #E5E7EB;border-radius:10px;background:none;cursor:pointer;font-size:20px;transition:all 0.15s">😊</button>
+    <button onclick="selectSendRating(5)" data-v="5" class="srating-btn" style="flex:1;padding:8px 4px;border:1.5px solid #E5E7EB;border-radius:10px;background:none;cursor:pointer;font-size:20px;transition:all 0.15s">🤩</button>
+  </div>
+  <div id="fb-text-wrap" style="display:none">
+    <textarea id="fb-text" placeholder="Was können wir besser machen? (optional)" rows="2"
+      style="width:100%;padding:9px 11px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:12px;font-family:inherit;color:#111827;resize:none;outline:none;box-sizing:border-box;transition:border-color 0.15s;margin-bottom:8px"
+      onfocus="this.style.borderColor='#6366F1'" onblur="this.style.borderColor='#E5E7EB'"></textarea>
+    <button onclick="submitSendFeedback()" style="width:100%;padding:9px;background:#6366F1;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Senden</button>
+  </div>
+</div>
+
+<!-- ─── HELP WIDGET ───────────────────────────────────────────────────────── -->
+<div id="help-widget" style="position:fixed;bottom:24px;right:24px;z-index:1500">
+
+  <!-- Panel -->
+  <div id="help-panel" style="display:none;position:absolute;bottom:68px;right:0;width:340px;background:#fff;border-radius:20px;box-shadow:0 8px 48px rgba(0,0,0,0.16);overflow:hidden;animation:helpSlide 0.25s cubic-bezier(0.16,1,0.3,1) both">
+
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#6366F1 0%,#818CF8 100%);padding:20px 20px 18px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:15px;font-weight:700;color:#fff">Hilfe & Support</span>
+        <button onclick="toggleHelp()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;line-height:1">&times;</button>
+      </div>
+      <p style="font-size:12px;color:rgba(255,255,255,0.75);margin:0">Häufige Fragen & Kontakt</p>
+    </div>
+
+    <!-- FAQ Home -->
+    <div id="help-home">
+      <div style="padding:14px 16px 6px;font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.08em">Häufige Fragen</div>
+      <div id="help-faq-list" style="max-height:280px;overflow-y:auto"></div>
+      <div style="padding:12px 16px;border-top:1px solid #F3F4F6">
+        <button onclick="showHelpSection('help-contact')"
+          style="width:100%;padding:10px 14px;background:none;border:1.5px dashed #E5E7EB;border-radius:12px;cursor:pointer;font-size:13px;color:#6B7280;font-family:inherit;text-align:left;transition:all 0.15s"
+          onmouseover="this.style.borderColor='#6366F1';this.style.color='#6366F1'"
+          onmouseout="this.style.borderColor='#E5E7EB';this.style.color='#6B7280'">
+          Frage nicht dabei? Nachricht schreiben →
+        </button>
+      </div>
+    </div>
+
+    <!-- Answer View -->
+    <div id="help-answer" style="display:none">
+      <div style="padding:16px 16px 0">
+        <button onclick="showHelpSection('help-home')" style="background:none;border:none;color:#6366F1;font-size:13px;font-weight:500;cursor:pointer;padding:0;margin-bottom:14px;display:flex;align-items:center;gap:4px;font-family:inherit">← Zurück</button>
+        <div id="help-answer-q" style="font-size:14px;font-weight:600;color:#111827;margin-bottom:10px;line-height:1.4"></div>
+        <div id="help-answer-a" style="font-size:13px;color:#6B7280;line-height:1.7;padding-bottom:16px"></div>
+      </div>
+      <div style="padding:14px 16px;border-top:1px solid #F3F4F6">
+        <div style="font-size:12px;color:#9CA3AF;margin-bottom:8px;text-align:center">Hat das geholfen?</div>
+        <div style="display:flex;gap:8px">
+          <button onclick="helpAnswerFeedback(true)"
+            style="flex:1;padding:8px;border:1.5px solid #E5E7EB;border-radius:10px;background:none;cursor:pointer;font-size:13px;color:#6B7280;font-family:inherit;transition:all 0.15s"
+            onmouseover="this.style.background='#F0FDF4';this.style.borderColor='#10B981';this.style.color='#059669'"
+            onmouseout="this.style.background='none';this.style.borderColor='#E5E7EB';this.style.color='#6B7280'">👍 Ja, danke</button>
+          <button onclick="helpAnswerFeedback(false)"
+            style="flex:1;padding:8px;border:1.5px solid #E5E7EB;border-radius:10px;background:none;cursor:pointer;font-size:13px;color:#6B7280;font-family:inherit;transition:all 0.15s"
+            onmouseover="this.style.background='#FEF2F2';this.style.borderColor='#EF4444';this.style.color='#DC2626'"
+            onmouseout="this.style.background='none';this.style.borderColor='#E5E7EB';this.style.color='#6B7280'">👎 Nicht wirklich</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Form -->
+    <div id="help-contact" style="display:none">
+      <div style="padding:16px">
+        <button onclick="showHelpSection('help-home')" style="background:none;border:none;color:#6366F1;font-size:13px;font-weight:500;cursor:pointer;padding:0;margin-bottom:14px;display:flex;align-items:center;gap:4px;font-family:inherit">← Zurück</button>
+        <div style="font-size:14px;font-weight:600;color:#111827;margin-bottom:2px">Nachricht schreiben</div>
+        <div style="font-size:12px;color:#9CA3AF;margin-bottom:14px">Wir antworten i.d.R. innerhalb von 24h.</div>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <input id="help-name" type="text" placeholder="Dein Name"
+            style="padding:9px 12px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;font-family:inherit;color:#111827;outline:none;transition:border-color 0.15s"
+            onfocus="this.style.borderColor='#6366F1'" onblur="this.style.borderColor='#E5E7EB'">
+          <input id="help-email" type="email" placeholder="Deine E-Mail"
+            style="padding:9px 12px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;font-family:inherit;color:#111827;outline:none;transition:border-color 0.15s"
+            onfocus="this.style.borderColor='#6366F1'" onblur="this.style.borderColor='#E5E7EB'">
+          <select id="help-category"
+            style="padding:9px 12px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;font-family:inherit;color:#111827;outline:none;background:#fff;transition:border-color 0.15s"
+            onfocus="this.style.borderColor='#6366F1'" onblur="this.style.borderColor='#E5E7EB'">
+            <option value="">Kategorie wählen</option>
+            <option value="Technisches Problem">Technisches Problem</option>
+            <option value="Konto & Abo">Konto & Abo</option>
+            <option value="Zahlung">Zahlung</option>
+            <option value="Feature-Wunsch">Feature-Wunsch</option>
+            <option value="Sonstiges">Sonstiges</option>
+          </select>
+          <textarea id="help-message" placeholder="Deine Nachricht…" rows="4"
+            style="padding:9px 12px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;font-family:inherit;color:#111827;outline:none;resize:vertical;transition:border-color 0.15s"
+            onfocus="this.style.borderColor='#6366F1'" onblur="this.style.borderColor='#E5E7EB'"></textarea>
+          <div id="help-contact-msg" style="display:none;font-size:13px;text-align:center;padding:4px 0"></div>
+          <button id="help-submit-btn" onclick="submitSupportRequest()"
+            style="padding:11px;background:#6366F1;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity 0.15s">
+            Senden
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Toggle Button -->
+  <button id="help-toggle-btn" onclick="toggleHelp()"
+    style="width:52px;height:52px;border-radius:50%;background:#6366F1;color:#fff;border:none;cursor:pointer;box-shadow:0 4px 24px rgba(99,102,241,0.45);display:flex;align-items:center;justify-content:center;transition:transform 0.2s,box-shadow 0.2s"
+    onmouseover="this.style.transform='scale(1.08)';this.style.boxShadow='0 6px 32px rgba(99,102,241,0.6)'"
+    onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 24px rgba(99,102,241,0.45)'">
+    <svg id="help-icon-open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    <svg id="help-icon-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="display:none">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+
 </div>
 
 <script src="/app.js" defer></script>
