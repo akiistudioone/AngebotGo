@@ -621,7 +621,7 @@ function buildPDF() {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(107, 114, 128);
-    doc.text('Unterschrift Auftragnehmer:', margin, y);
+    doc.text('Unterschrift Auftraggeber:', margin, y);
     doc.text('Datum: ' + formatDateDE(getTodayISO()), colRight, y, { align: 'right' });
     y += 3;
     // Use fixed dimensions: 50mm wide × 14mm high (canvas is always wider than tall)
