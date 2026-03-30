@@ -43,9 +43,17 @@
     <div style="display:flex;align-items:center;cursor:pointer" onclick="showView('view-landing');window.scrollTo({top:0,behavior:'smooth'})">
       <img id="nav-logo-img" src="/assets/logo-white.png" alt="AngebotGo" style="height:36px;width:auto;display:block">
     </div>
-    <button id="landing-cta-btn" onclick="goToEmailGate()"
-      style="padding:10px 22px;border-radius:999px;background:var(--primary);color:#fff;border:none;cursor:pointer;font-weight:600;font-size:14px;font-family:var(--font);transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 2px 12px rgba(99,102,241,0.35);display:inline-flex;align-items:center;justify-content:center;line-height:1"
-      onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">Jetzt kostenlos starten</button>
+    <div style="display:flex;align-items:center;gap:20px">
+      <a id="nav-link-generator" href="#" onclick="goToGenerator();return false"
+        style="font-size:13px;font-weight:500;color:rgba(255,255,255,0.8);text-decoration:none;transition:color 0.15s"
+        onmouseover="this.style.color='#fff'" onmouseout="this.style.color=''">Generator</a>
+      <a id="nav-link-login" href="#" onclick="goToEmailGate();return false"
+        style="font-size:13px;font-weight:500;color:rgba(255,255,255,0.8);text-decoration:none;transition:color 0.15s"
+        onmouseover="this.style.color='#fff'" onmouseout="this.style.color=''">Login</a>
+      <button id="landing-cta-btn" onclick="goToGenerator()"
+        style="padding:10px 22px;border-radius:999px;background:var(--primary);color:#fff;border:none;cursor:pointer;font-weight:600;font-size:14px;font-family:var(--font);transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 2px 12px rgba(99,102,241,0.35);display:inline-flex;align-items:center;justify-content:center;line-height:1"
+        onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">Jetzt kostenlos starten</button>
+    </div>
   </nav>
 
   <!-- HERO SECTION -->
@@ -68,7 +76,7 @@
           und sende sie sofort per E-Mail.
         </p>
         <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center">
-          <button onclick="goToEmailGate()"
+          <button onclick="goToGenerator()"
             style="padding:16px 36px;border-radius:999px;background:var(--primary);color:#fff;border:none;cursor:pointer;font-weight:700;font-size:16px;font-family:var(--font);transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 24px rgba(99,102,241,0.5)"
             onmouseover="this.style.transform='scale(1.03)';this.style.boxShadow='0 8px 32px rgba(99,102,241,0.65)'"
             onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 24px rgba(99,102,241,0.5)'">
@@ -372,7 +380,7 @@
             <li style="font-size:14px;color:var(--muted);display:flex;gap:10px;align-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Mit Wasserzeichen</li>
           </ul>
           <div style="margin-top:auto">
-            <button class="btn btn-secondary btn-full" onclick="goToEmailGate()" style="border-radius:12px;padding:13px">Kostenlos starten</button>
+            <button class="btn btn-secondary btn-full" onclick="goToGenerator()" style="border-radius:12px;padding:13px">Kostenlos starten</button>
             <p style="font-size:12px;margin-top:14px;visibility:hidden">&nbsp;</p>
           </div>
         </div>
@@ -393,7 +401,7 @@
               <li style="font-size:14px;display:flex;gap:10px;align-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>Vorlagen &amp; Support</li>
             </ul>
             <div style="margin-top:auto">
-              <button class="btn btn-primary btn-full" onclick="goToEmailGate()" style="border-radius:12px;padding:13px;position:relative;overflow:hidden"
+              <button class="btn btn-primary btn-full" onclick="startCheckout('monthly')" style="border-radius:12px;padding:13px;position:relative;overflow:hidden"
                 onmouseover="this.querySelector('.shimmer').style.animation='shimmer 1.2s infinite'"
                 onmouseout="this.querySelector('.shimmer').style.animation='none'">
                 Pro starten
@@ -413,7 +421,7 @@
       <h2 class="scroll-anim" style="font-size:clamp(28px,3.5vw,48px);font-weight:700;color:#fff;margin-bottom:16px;line-height:1.15">Starte jetzt und erstelle dein erstes Angebot in 2 Minuten.</h2>
       <p class="scroll-anim" data-delay="80" style="font-size:17px;color:rgba(255,255,255,0.65);margin-bottom:40px">Kostenlos, ohne Kreditkarte, sofort loslegen.</p>
       <div class="scroll-anim" data-delay="160">
-        <button onclick="goToEmailGate()"
+        <button onclick="goToGenerator()"
           style="padding:17px 44px;border-radius:999px;background:#fff;color:var(--primary);border:none;cursor:pointer;font-weight:700;font-size:16px;font-family:var(--font);transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 24px rgba(0,0,0,0.2)"
           onmouseover="this.style.transform='scale(1.03)';this.style.boxShadow='0 8px 32px rgba(0,0,0,0.3)'"
           onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 24px rgba(0,0,0,0.2)'">
@@ -446,6 +454,8 @@
   </nav>
   <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px">
   <div class="card" style="max-width:440px;width:100%;padding:40px;animation:fadeUp 0.5s ease both">
+    <!-- Pending action message -->
+    <div id="auth-pending-msg" style="display:none;margin-bottom:20px;padding:12px 16px;background:rgba(99,102,241,0.08);border:1.5px solid rgba(99,102,241,0.2);border-radius:10px;font-size:13px;color:var(--primary);font-weight:500;text-align:center"></div>
     <!-- Tabs -->
     <div style="display:flex;border-bottom:1.5px solid var(--border);margin-bottom:24px">
       <button id="tab-login" onclick="switchAuthTab('login')"

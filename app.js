@@ -15,6 +15,7 @@ const state = {
   positions: [],
   previewTimer: null,
   accessToken: null,
+  pendingAction: null,
 };
 
 // ─── CONSTANTS ───────────────────────────────────────────────────────────────
@@ -673,7 +674,8 @@ function downloadPDF() {
 
 
 // ─── VIEWS ────────────────────────────────────────────────────────────────────
-async function goToEmailGate() {
+async function goToEmailGate(pending) {
+  if (pending) state.pendingAction = pending;
   // Sign out any existing session so login always fetches fresh backend data
   if (_sb) {
     try { await _sb.auth.signOut(); } catch {}
@@ -682,6 +684,15 @@ async function goToEmailGate() {
   state.accessToken = null;
   state.isPro = false;
   state.bonusQuotes = 0;
+  const pendingMsg = document.getElementById('auth-pending-msg');
+  if (pendingMsg) {
+    if (pending === 'send') {
+      pendingMsg.textContent = 'Bitte melde dich an, um dein Angebot zu senden.';
+      pendingMsg.style.display = 'block';
+    } else {
+      pendingMsg.style.display = 'none';
+    }
+  }
   showView('view-email');
   setTimeout(() => { const el = document.getElementById('auth-login-email'); if (el) el.focus(); }, 50);
 }
@@ -845,9 +856,11 @@ async function signOut() {
   state.accessToken = null;
   state.isPro = false;
   state.quoteCount = 0;
+  state.bonusQuotes = 0;
+  state.pendingAction = null;
   toggleUserMenu(false);
-  showView('view-email');
-  setTimeout(() => { const el = document.getElementById('auth-login-email'); if (el) el.focus(); }, 50);
+  showView('view-landing');
+  window.scrollTo(0, 0);
 }
 
 
@@ -873,21 +886,6 @@ async function restoreSession(session) {
   state.email = session.user.email;
   state.accessToken = session.access_token;
 
-  const saved = localStorage.getItem('saved_sender_info');
-  if (saved) {
-    try {
-      const info = JSON.parse(saved);
-      if (info.firma) document.getElementById('s-firma').value = info.firma;
-      if (info.strasse) document.getElementById('s-strasse').value = info.strasse;
-      if (info.plz) document.getElementById('s-plz').value = info.plz;
-      if (info.ort) document.getElementById('s-ort').value = info.ort;
-      if (info.tel) document.getElementById('s-tel').value = info.tel;
-      if (info.sEmail) document.getElementById('s-email').value = info.sEmail;
-      if (info.iban) document.getElementById('s-iban').value = info.iban;
-      if (info.bic) document.getElementById('s-bic').value = info.bic;
-    } catch {}
-  }
-
   updateUserMenu();
   updateLandingNav();
 
@@ -909,13 +907,19 @@ async function restoreSession(session) {
 // Update the landing page nav button based on login state
 function updateLandingNav() {
   const btn = document.getElementById('landing-cta-btn');
-  if (!btn) return;
-  if (state.email) {
-    btn.textContent = 'Weiter zum Generator →';
-    btn.onclick = () => goToEmailGate();
-  } else {
-    btn.textContent = 'Jetzt kostenlos starten';
-    btn.onclick = () => goToEmailGate();
+  if (btn) {
+    btn.textContent = state.email ? 'Weiter zum Generator →' : 'Jetzt kostenlos starten';
+    btn.onclick = () => goToGenerator();
+  }
+  const loginLink = document.getElementById('nav-link-login');
+  if (loginLink) {
+    if (state.email) {
+      loginLink.textContent = state.email.charAt(0).toUpperCase() + ' Profil';
+      loginLink.onclick = (e) => { e.preventDefault(); showProfile(); };
+    } else {
+      loginLink.textContent = 'Login';
+      loginLink.onclick = (e) => { e.preventDefault(); goToEmailGate(); };
+    }
   }
 }
 
@@ -971,7 +975,12 @@ async function initAfterLogin(session) {
     updateUserMenu();
   }
 
+  const pending = state.pendingAction;
+  state.pendingAction = null;
   goToGenerator();
+  if (pending === 'send') {
+    setTimeout(() => handleSendQuote(), 150);
+  }
 }
 
 // ─── USER MENU ────────────────────────────────────────────────────────────────
@@ -1134,6 +1143,12 @@ function saveSenderInfo() {
 
 // ─── SEND QUOTE ───────────────────────────────────────────────────────────────
 async function handleSendQuote() {
+  // Require login — gate here if not authenticated
+  if (!state.accessToken) {
+    await goToEmailGate('send');
+    return;
+  }
+
   if (!state.isPro && state.quoteCount >= FREE_LIMIT + state.bonusQuotes) {
     showPaywall();
     return;
@@ -1401,9 +1416,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         applyProStatus();
         setTimeout(() => showToast('✓ Upgrade erfolgreich! Du bist jetzt Pro.'), 600);
       } else {
-        // Sign out silently so next generator access forces fresh login + data fetch
-        await _sb.auth.signOut();
-        // Stay on landing page (do not redirect)
+        // Restore session silently so user stays on landing with auth state intact
+        await restoreSession(session);
       }
     }
 
@@ -1610,19 +1624,26 @@ document.addEventListener('DOMContentLoaded', function() {
   var nav = document.getElementById('landing-nav');
   var navLogoImg = document.getElementById('nav-logo-img');
   if (nav) {
+    var navLinkGen = document.getElementById('nav-link-generator');
+    var navLinkLogin = document.getElementById('nav-link-login');
     function _updateNav() {
-      if (window.scrollY > 50) {
+      var scrolled = window.scrollY > 50;
+      if (scrolled) {
         nav.style.background = 'rgba(255,255,255,0.95)';
         nav.style.backdropFilter = 'blur(20px)';
         nav.style.borderBottom = '1px solid rgba(0,0,0,0.08)';
         nav.style.boxShadow = '0 2px 20px rgba(0,0,0,0.06)';
         if (navLogoImg) navLogoImg.src = '/assets/logo-blue.png';
+        if (navLinkGen) navLinkGen.style.color = 'rgba(17,24,39,0.7)';
+        if (navLinkLogin) navLinkLogin.style.color = 'rgba(17,24,39,0.7)';
       } else {
         nav.style.background = 'transparent';
         nav.style.backdropFilter = 'none';
         nav.style.borderBottom = 'none';
         nav.style.boxShadow = 'none';
         if (navLogoImg) navLogoImg.src = '/assets/logo-white.png';
+        if (navLinkGen) navLinkGen.style.color = 'rgba(255,255,255,0.8)';
+        if (navLinkLogin) navLinkLogin.style.color = 'rgba(255,255,255,0.8)';
       }
     }
     window.addEventListener('scroll', _updateNav, { passive: true });
