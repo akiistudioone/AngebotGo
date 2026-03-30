@@ -934,21 +934,24 @@ async function initAfterLogin(session) {
 
   updateUserMenu();
   updateLandingNav();
-  goToGenerator();
 
-  // Fetch real Pro/quota status from server (non-blocking)
-  fetch('/.netlify/functions/track-quote', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
-    body: JSON.stringify({ email: state.email, check_only: true }),
-  }).then(r => r.ok ? r.json() : null).then(data => {
-    if (!data) return;
-    if (typeof data.quote_count === 'number') state.quoteCount = data.quote_count;
-    if (typeof data.bonus_quotes === 'number') state.bonusQuotes = data.bonus_quotes;
-    if (data.is_pro === true) applyProStatus();
-    else updateCounter();
-    if (data.profile) loadProfileFromServer(data.profile);
-  }).catch(() => {});
+  // Fetch fresh quota/profile from backend before showing generator
+  try {
+    const r = await fetch('/.netlify/functions/track-quote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+      body: JSON.stringify({ email: state.email, check_only: true }),
+    });
+    if (r.ok) {
+      const data = await r.json();
+      if (typeof data.quote_count === 'number') state.quoteCount = data.quote_count;
+      if (typeof data.bonus_quotes === 'number') state.bonusQuotes = data.bonus_quotes;
+      if (data.is_pro === true) applyProStatus();
+      if (data.profile) loadProfileFromServer(data.profile);
+    }
+  } catch {}
+
+  goToGenerator();
 }
 
 // ─── USER MENU ────────────────────────────────────────────────────────────────
@@ -1383,11 +1386,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const { data: { session } } = await _sb.auth.getSession();
     if (session) {
-      await restoreSession(session);
       if (urlParams.get('checkout') === 'success') {
-        applyProStatus();
+        // Checkout return: restore session, apply pro, then fetch fresh data
         await initAfterLogin(session);
+        applyProStatus();
         setTimeout(() => showToast('✓ Upgrade erfolgreich! Du bist jetzt Pro.'), 600);
+      } else {
+        // Always force re-login on page reload so fresh backend data is loaded
+        await _sb.auth.signOut();
+        showView('view-email');
       }
     }
 
