@@ -689,6 +689,9 @@ async function goToEmailGate(pending) {
     if (pending === 'send') {
       pendingMsg.textContent = 'Bitte melde dich an, um dein Angebot zu senden.';
       pendingMsg.style.display = 'block';
+    } else if (pending && pending.startsWith('checkout:')) {
+      pendingMsg.textContent = 'Bitte melde dich an, um Pro zu aktivieren.';
+      pendingMsg.style.display = 'block';
     } else {
       pendingMsg.style.display = 'none';
     }
@@ -977,9 +980,15 @@ async function initAfterLogin(session) {
 
   const pending = state.pendingAction;
   state.pendingAction = null;
-  goToGenerator();
-  if (pending === 'send') {
-    setTimeout(() => handleSendQuote(), 150);
+  if (pending && pending.startsWith('checkout:')) {
+    const plan = pending.split(':')[1];
+    goToGenerator();
+    setTimeout(() => startCheckout(plan), 150);
+  } else {
+    goToGenerator();
+    if (pending === 'send') {
+      setTimeout(() => handleSendQuote(), 150);
+    }
   }
 }
 
@@ -1326,9 +1335,12 @@ async function trackQuote() {
 
 // ─── STRIPE CHECKOUT ──────────────────────────────────────────────────────────
 async function startCheckout(plan) {
+  if (!state.accessToken) {
+    await goToEmailGate('checkout:' + plan);
+    return;
+  }
   try {
-    const headers = { 'Content-Type': 'application/json' };
-    if (state.accessToken) headers['Authorization'] = `Bearer ${state.accessToken}`;
+    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.accessToken}` };
     const res = await fetch('/.netlify/functions/create-checkout', {
       method: 'POST',
       headers,
@@ -1338,10 +1350,10 @@ async function startCheckout(plan) {
     if (data.url) {
       window.location.href = data.url;
     } else {
-      showAlert('Fehler beim Starten des Bezahlvorgangs. Bitte versuchen Sie es erneut.');
+      showAlert('Fehler beim Starten des Bezahlvorgangs. Bitte versuche es erneut.');
     }
   } catch {
-    showAlert('Netzwerkfehler. Bitte versuchen Sie es erneut.');
+    showAlert('Netzwerkfehler. Bitte versuche es erneut.');
   }
 }
 
