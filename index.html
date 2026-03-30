@@ -22,10 +22,8 @@
       <img id="nav-logo-img" src="/assets/logo-white.png" alt="AngebotGo" style="height:36px;width:auto;display:block">
     </div>
     <button id="landing-cta-btn" onclick="goToEmailGate()"
-      style="padding:10px 22px;border-radius:999px;background:var(--primary);color:#fff;border:none;cursor:pointer;font-weight:600;font-size:14px;font-family:var(--font);transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 2px 12px rgba(99,102,241,0.35)"
-      onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-      Jetzt kostenlos starten
-    </button>
+      style="padding:10px 22px;border-radius:999px;background:var(--primary);color:#fff;border:none;cursor:pointer;font-weight:600;font-size:14px;font-family:var(--font);transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 2px 12px rgba(99,102,241,0.35);display:inline-flex;align-items:center;justify-content:center;line-height:1"
+      onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">Jetzt kostenlos starten</button>
   </nav>
 
   <!-- HERO SECTION -->
@@ -402,27 +400,30 @@
         <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:16px">Keine Kreditkarte · Sofort loslegen · DSGVO-konform</p>
       </div>
     </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer style="padding:28px 48px;background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);text-align:center;border-top:1px solid rgba(255,255,255,0.06)">
-    <div style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;font-size:12px;color:rgba(255,255,255,0.35)">
+    <div style="margin-top:64px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;font-size:12px;color:rgba(255,255,255,0.35)">
       <span>© 2026 AngebotGo</span>
       <a href="#" onclick="document.getElementById('modal-agb').style.display='flex';return false" style="color:rgba(255,255,255,0.35);text-decoration:none">AGB</a>
       <a href="#" onclick="document.getElementById('modal-datenschutz').style.display='flex';return false" style="color:rgba(255,255,255,0.35);text-decoration:none">Datenschutz</a>
       <a href="#" onclick="document.getElementById('modal-impressum').style.display='flex';return false" style="color:rgba(255,255,255,0.35);text-decoration:none">Impressum</a>
     </div>
-  </footer>
+  </section>
 
 </div><!-- /view-landing -->
 
 <!-- VIEW 1: AUTH -->
-<div id="view-email" class="view" style="min-height:100vh;align-items:center;justify-content:center;background:linear-gradient(135deg,#F0F0FF 0%,#F8F9FF 50%,#FFF 100%);padding:24px">
-  <div class="card" style="max-width:440px;width:100%;padding:40px;animation:fadeUp 0.5s ease both">
-    <!-- Logo -->
-    <div style="text-align:center;margin-bottom:24px;animation:springIn 0.7s cubic-bezier(0.34,1.56,0.64,1) both">
-      <img src="/assets/logo-color.png" alt="AngebotGo" style="height:44px;width:auto">
+<div id="view-email" class="view" style="min-height:100vh;flex-direction:column;background:linear-gradient(135deg,#F0F0FF 0%,#F8F9FF 50%,#FFF 100%)">
+  <!-- Auth Nav -->
+  <nav style="width:100%;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:#fff;box-sizing:border-box;flex-shrink:0">
+    <div style="display:flex;align-items:center;cursor:pointer" onclick="showView('view-landing');window.scrollTo({top:0,behavior:'smooth'})">
+      <img src="/assets/logo-color.png" alt="AngebotGo" style="height:32px;width:auto;display:block">
     </div>
+    <button onclick="showView('view-landing');window.scrollTo({top:0,behavior:'smooth'})"
+      style="padding:8px 18px;border-radius:999px;background:none;border:1.5px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;font-family:var(--font);color:var(--text);display:inline-flex;align-items:center;gap:6px">
+      ← Zurück zur Startseite
+    </button>
+  </nav>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px">
+  <div class="card" style="max-width:440px;width:100%;padding:40px;animation:fadeUp 0.5s ease both">
     <!-- Tabs -->
     <div style="display:flex;border-bottom:1.5px solid var(--border);margin-bottom:24px">
       <button id="tab-login" onclick="switchAuthTab('login')"
@@ -493,6 +494,7 @@
       <span style="font-size:12px;color:var(--muted)">Kein Spam. Keine Kreditkarte.</span>
     </div>
   </div>
+  </div><!-- /center-wrapper -->
 </div>
 
 <!-- VIEW 2: QUOTE GENERATOR -->
