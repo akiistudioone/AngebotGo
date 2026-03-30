@@ -1591,7 +1591,7 @@ document.addEventListener('DOMContentLoaded', function() {
         nav.style.backdropFilter = 'blur(20px)';
         nav.style.borderBottom = '1px solid rgba(0,0,0,0.08)';
         nav.style.boxShadow = '0 2px 20px rgba(0,0,0,0.06)';
-        if (navLogoImg) navLogoImg.src = '/assets/logo-color.png';
+        if (navLogoImg) navLogoImg.src = '/assets/logo-blue.png';
       } else {
         nav.style.background = 'transparent';
         nav.style.backdropFilter = 'none';
