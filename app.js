@@ -1182,9 +1182,11 @@ async function redeemPromoCode() {
       input.value = '';
       // Re-sync counter from server
       try {
+        const syncHeaders = { 'Content-Type': 'application/json' };
+        if (state.accessToken) syncHeaders['Authorization'] = `Bearer ${state.accessToken}`;
         const sr = await fetch('/.netlify/functions/track-quote', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: syncHeaders,
           body: JSON.stringify({ email: state.email, check_only: true }),
         });
         if (sr.ok) {
@@ -1193,7 +1195,8 @@ async function redeemPromoCode() {
             state.quoteCount = sd.quote_count;
             localStorage.setItem('quote_counter_local', String(sd.quote_count));
           }
-          if (typeof sd.bonus_quotes === 'number') state.bonusQuotes = sd.bonus_quotes;
+          // Take max to prevent stale server value overwriting the fresh client increment
+          if (typeof sd.bonus_quotes === 'number') state.bonusQuotes = Math.max(state.bonusQuotes, sd.bonus_quotes);
           if (typeof sd.is_pro === 'boolean' && sd.is_pro) applyProStatus();
           updateCounter();
         }
