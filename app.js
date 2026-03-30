@@ -1681,8 +1681,8 @@ const HELP_FAQS = [
     a: 'Gehe zu „Mein Profil" und klicke auf „Abo über Stripe verwalten / kündigen". Dort findest du alle Optionen zum Verwalten oder Kündigen deines Abonnements. Gekündigte Abos laufen bis zum Ende der bezahlten Periode weiter.',
   },
   {
-    q: 'Kann ich das Angebot als PDF herunterladen?',
-    a: 'Ja. Im Generator gibt es einen „PDF herunterladen"-Button. So kannst du das Angebot auch ausdrucken oder direkt an den Kunden übergeben.',
+    q: 'In welchem Format wird das Angebot versendet?',
+    a: 'Das Angebot wird automatisch als PDF-Datei generiert und per E-Mail an dich (und optional den Kunden in CC) gesendet. Ein separater Download-Button ist nicht vorgesehen – das PDF landet direkt im Postfach.',
   },
   {
     q: 'Was ist ein Promo-Code?',
