@@ -16,6 +16,8 @@ const state = {
   previewTimer: null,
   accessToken: null,
   pendingAction: null,
+  logoDataUrl: null,
+  accentColor: '#6366F1',
 };
 
 // ─── CONSTANTS ───────────────────────────────────────────────────────────────
@@ -57,6 +59,11 @@ function parseNum(str) {
   const cleaned = String(str).replace(/\./g, '').replace(',', '.');
   const n = parseFloat(cleaned);
   return isNaN(n) ? 0 : n;
+}
+
+function hexToRgb(hex) {
+  const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return r ? [parseInt(r[1],16), parseInt(r[2],16), parseInt(r[3],16)] : [99,102,241];
 }
 
 function sanitizeDisplay(str) {
@@ -344,7 +351,7 @@ function generatePreview() {
   const netto = state.positions.reduce((s, p) => s + p.qty * p.ep, 0);
   const vatAmt = netto * (state.vatRate / 100);
   const total = netto + vatAmt;
-  const watermark = '';
+  const ac = state.accentColor;
 
   const rows = state.positions.map((p, i) => `
     <tr style="background:${i % 2 === 0 ? '#fff' : '#F8F9FF'}">
@@ -356,87 +363,163 @@ function generatePreview() {
       <td style="padding:6px 4px;border-bottom:1px solid #E5E7EB;text-align:right;white-space:nowrap;font-weight:600">${fmtEur(p.qty * p.ep)}</td>
     </tr>`).join('');
 
+  // Logo (Pro only)
+  const logoHtml = (state.isPro && state.logoDataUrl)
+    ? `<img src="${state.logoDataUrl}" style="max-height:44px;max-width:160px;object-fit:contain;display:block;margin-bottom:6px" alt="Logo">`
+    : '';
+
+  // DIN 5008 sender miniline above recipient window
+  const absenderZeile = [sanitizeDisplay(f.sFirma), sanitizeDisplay(f.sStrasse),
+    [sanitizeDisplay(f.sPlz), sanitizeDisplay(f.sOrt)].filter(Boolean).join(' ')
+  ].filter(Boolean).join(' · ');
+
+  // Signature (Pro only)
+  const sigDataUrl = state.isPro ? getSignatureDataUrl() : null;
+  const sigHtml = sigDataUrl
+    ? `<div style="margin-top:24px">
+        <img src="${sigDataUrl}" style="max-height:56px;max-width:180px;display:block;margin-bottom:4px" alt="Unterschrift">
+        <div style="width:180px;border-top:1px solid #D1D5DB;padding-top:3px;font-size:9px;color:#9CA3AF">${sanitizeDisplay(f.sFirma) || 'Unterschrift'}</div>
+      </div>`
+    : '';
+
   const html = `
-    <div style="position:relative;font-family:'Inter',sans-serif;font-size:12px;color:#111827">
-      ${watermark}
-      <div style="position:relative;z-index:1">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
-          <div>
-            <div style="font-size:16px;font-weight:700;color:#111827">${sanitizeDisplay(f.sFirma) || 'Firmenname'}</div>
-            <div style="color:#6B7280;margin-top:2px">${sanitizeDisplay(f.sStrasse)}</div>
-            <div style="color:#6B7280">${sanitizeDisplay(f.sPlz)} ${sanitizeDisplay(f.sOrt)}</div>
-            ${f.sTel ? `<div style="color:#6B7280">${sanitizeDisplay(f.sTel)}</div>` : ''}
-            ${f.sEmail ? `<div style="color:#6366F1">${sanitizeDisplay(f.sEmail)}</div>` : ''}
-          </div>
-          <div style="text-align:right">
-            <div style="font-size:22px;font-weight:700;color:#6366F1;letter-spacing:-0.5px">ANGEBOT</div>
-            <div style="margin-top:8px;font-size:11px;color:#6B7280">
-              <div>Nr. <strong style="color:#111827">${sanitizeDisplay(f.qNummer)}</strong></div>
-              <div>Datum: ${formatDateDE(f.qDatum)}</div>
-              <div>Gültig bis: ${formatDateDE(f.qGueltig)}</div>
-            </div>
+    <div style="font-family:'Inter',sans-serif;font-size:11px;color:#111827;line-height:1.55">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+        <div style="max-width:55%">
+          ${logoHtml}
+          <div style="font-size:${logoHtml ? '13' : '15'}px;font-weight:700;color:#111827">${sanitizeDisplay(f.sFirma) || 'Firmenname'}</div>
+          <div style="color:#6B7280;font-size:10px;margin-top:3px;line-height:1.7">
+            ${f.sStrasse ? `<div>${sanitizeDisplay(f.sStrasse)}</div>` : ''}
+            ${(f.sPlz || f.sOrt) ? `<div>${sanitizeDisplay(f.sPlz)} ${sanitizeDisplay(f.sOrt)}</div>` : ''}
+            ${f.sTel ? `<div>${sanitizeDisplay(f.sTel)}</div>` : ''}
+            ${f.sEmail ? `<div style="color:${ac}">${sanitizeDisplay(f.sEmail)}</div>` : ''}
           </div>
         </div>
-        <div style="background:#F8F9FF;border-radius:6px;padding:12px;margin-bottom:16px">
-          <div style="font-size:11px;color:#6B7280;margin-bottom:4px">Empfänger</div>
-          <div style="font-weight:600">${sanitizeDisplay(f.rName) || '—'}</div>
-          <div style="color:#6B7280">${sanitizeDisplay(f.rStrasse)}</div>
-          <div style="color:#6B7280">${sanitizeDisplay(f.rPlz)} ${sanitizeDisplay(f.rOrt)}</div>
-        </div>
-        <div style="border-top:2px solid #6366F1;margin-bottom:12px"></div>
-        <div style="overflow-x:hidden;width:100%">
-        <table style="width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed">
-          <colgroup>
-            <col style="width:20px">
-            <col>
-            <col style="width:36px">
-            <col style="width:36px">
-            <col style="width:64px">
-            <col style="width:64px">
-          </colgroup>
-          <thead>
-            <tr style="background:#6366F1;color:#fff">
-              <th style="padding:6px 4px;text-align:left;font-weight:600">#</th>
-              <th style="padding:6px 4px;text-align:left;font-weight:600">Beschreibung</th>
-              <th style="padding:6px 4px;text-align:right;font-weight:600">Mge</th>
-              <th style="padding:6px 4px;text-align:left;font-weight:600">Einh.</th>
-              <th style="padding:6px 4px;text-align:right;font-weight:600;white-space:nowrap">Einzelpr.</th>
-              <th style="padding:6px 4px;text-align:right;font-weight:600;white-space:nowrap">Gesamt</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-        </div>
-        <div style="display:flex;justify-content:flex-end;margin-top:16px">
-          <div style="min-width:min(200px,100%)">
-            <div style="display:flex;justify-content:space-between;padding:4px 0;color:#6B7280">
-              <span>Zwischensumme</span><span>${fmtEur(netto)}</span>
-            </div>
-            ${state.vatRate > 0 ? `<div style="display:flex;justify-content:space-between;padding:4px 0;color:#6B7280">
-              <span>MwSt. (${state.vatRate}%)</span><span>${fmtEur(vatAmt)}</span>
-            </div>` : ''}
-            <div style="display:flex;justify-content:space-between;padding:8px 0;font-weight:700;font-size:14px;color:#6366F1;border-top:2px solid #6366F1;margin-top:4px">
-              <span>Gesamtbetrag</span><span>${fmtEur(total)}</span>
-            </div>
+        <div style="text-align:right">
+          <div style="font-size:20px;font-weight:700;color:${ac};letter-spacing:-0.5px">ANGEBOT</div>
+          <div style="margin-top:6px;font-size:10px;color:#6B7280;line-height:1.7">
+            <div>Nr. <strong style="color:#111827">${sanitizeDisplay(f.qNummer)}</strong></div>
+            <div>Datum: ${formatDateDE(f.qDatum)}</div>
+            <div>Gültig bis: ${formatDateDE(f.qGueltig)}</div>
           </div>
         </div>
-        ${f.qAnmerkung ? `<div style="margin-top:16px;padding:12px;background:#F8F9FF;border-radius:6px;font-size:11px;color:#6B7280"><strong style="color:#111827">Anmerkungen:</strong><br>${sanitizeDisplay(f.qAnmerkung)}</div>` : ''}
-        ${f.qZahlung !== 'keine' ? `<div style="margin-top:16px;font-size:11px;color:#6B7280">Zahlungsziel: ${sanitizeDisplay(f.qZahlung)}${/^\d+$/.test(f.qZahlung) ? ' Tage netto' : ''}</div>` : ''}
-        ${state.vatRate === 0 ? `<div style="margin-top:10px;padding:8px 10px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:6px;font-size:10px;color:#92400E"><strong>Hinweis:</strong> Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</div>` : ''}
-        ${(f.sIban || f.sBic) ? `<div style="margin-top:8px;font-size:10px;color:#6B7280">Bankverbindung: ${sanitizeDisplay(f.sIban)}${f.sBic ? ' · ' + sanitizeDisplay(f.sBic) : ''}</div>` : ''}
-        ${!state.isPro ? `<div style="margin-top:20px;text-align:center;font-size:10px;color:#9CA3AF">Erstellt mit AngebotGo</div>` : ''}
       </div>
+      <div style="margin-bottom:18px">
+        ${absenderZeile ? `<div style="font-size:8px;color:#9CA3AF;margin-bottom:5px;padding-bottom:3px;border-bottom:1px solid #F3F4F6">${absenderZeile}</div>` : ''}
+        <div style="border:1px solid #E5E7EB;border-radius:4px;padding:10px 12px;background:#FAFAFA;min-height:52px">
+          <div style="font-weight:600;font-size:11px">${sanitizeDisplay(f.rName) || '—'}</div>
+          ${f.rStrasse ? `<div style="color:#6B7280;font-size:10px">${sanitizeDisplay(f.rStrasse)}</div>` : ''}
+          ${(f.rPlz || f.rOrt) ? `<div style="color:#6B7280;font-size:10px">${sanitizeDisplay(f.rPlz)} ${sanitizeDisplay(f.rOrt)}</div>` : ''}
+        </div>
+      </div>
+      <div style="border-top:2px solid ${ac};margin-bottom:14px"></div>
+      <div style="overflow-x:hidden;width:100%">
+      <table style="width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed">
+        <colgroup>
+          <col style="width:20px"><col><col style="width:34px">
+          <col style="width:34px"><col style="width:60px"><col style="width:60px">
+        </colgroup>
+        <thead>
+          <tr style="background:${ac};color:#fff">
+            <th style="padding:6px 4px;text-align:left;font-weight:600">#</th>
+            <th style="padding:6px 4px;text-align:left;font-weight:600">Beschreibung</th>
+            <th style="padding:6px 4px;text-align:right;font-weight:600">Mge</th>
+            <th style="padding:6px 4px;text-align:left;font-weight:600">Einh.</th>
+            <th style="padding:6px 4px;text-align:right;font-weight:600;white-space:nowrap">Einzelpr.</th>
+            <th style="padding:6px 4px;text-align:right;font-weight:600;white-space:nowrap">Gesamt</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:16px">
+        <div style="min-width:min(200px,100%)">
+          <div style="display:flex;justify-content:space-between;padding:4px 0;color:#6B7280;font-size:11px">
+            <span>Zwischensumme</span><span>${fmtEur(netto)}</span>
+          </div>
+          ${state.vatRate > 0 ? `<div style="display:flex;justify-content:space-between;padding:4px 0;color:#6B7280;font-size:11px">
+            <span>MwSt. (${state.vatRate}%)</span><span>${fmtEur(vatAmt)}</span>
+          </div>` : ''}
+          <div style="display:flex;justify-content:space-between;padding:8px 0;font-weight:700;font-size:13px;color:${ac};border-top:2px solid ${ac};margin-top:4px">
+            <span>Gesamtbetrag</span><span>${fmtEur(total)}</span>
+          </div>
+        </div>
+      </div>
+      ${f.qAnmerkung ? `<div style="margin-top:14px;padding:10px 12px;background:#F8F9FF;border-radius:6px;font-size:10px;color:#6B7280"><strong style="color:#111827">Anmerkungen:</strong><br>${sanitizeDisplay(f.qAnmerkung)}</div>` : ''}
+      ${f.qZahlung !== 'keine' ? `<div style="margin-top:10px;font-size:10px;color:#6B7280">Zahlungsziel: ${sanitizeDisplay(f.qZahlung)}${/^\d+$/.test(f.qZahlung) ? ' Tage netto' : ''}</div>` : ''}
+      ${state.vatRate === 0 ? `<div style="margin-top:8px;padding:8px 10px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:6px;font-size:9px;color:#92400E"><strong>Hinweis:</strong> Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</div>` : ''}
+      ${(f.sIban || f.sBic) ? `<div style="margin-top:8px;font-size:9px;color:#6B7280">Bankverbindung: ${sanitizeDisplay(f.sIban)}${f.sBic ? ' · ' + sanitizeDisplay(f.sBic) : ''}</div>` : ''}
+      ${sigHtml}
+      ${!state.isPro ? `<div style="margin-top:20px;text-align:center;font-size:10px;color:#9CA3AF">Erstellt mit AngebotGo</div>` : ''}
     </div>`;
 
-  const container = document.getElementById('preview-content');
-  container.style.opacity = '0';
-  container.style.transition = 'opacity 0.2s';
-  setTimeout(() => {
-    container.innerHTML = html;
-    container.style.opacity = '1';
-  }, 100);
+  ['preview-content', 'mobile-preview-content'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.opacity = '0';
+    el.style.transition = 'opacity 0.2s';
+    setTimeout(() => { el.innerHTML = html; el.style.opacity = '1'; }, 100);
+  });
 }
 
+
+// ─── LOGO UPLOAD (Pro) ────────────────────────────────────────────────────────
+function handleLogoUpload(e) {
+  if (!state.isPro) { showPaywall(); return; }
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { showAlert('Logo darf maximal 2 MB groß sein.'); return; }
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const img = new Image();
+    img.onload = function() {
+      const MAX_W = 240, MAX_H = 80;
+      const scale = Math.min(MAX_W / img.width, MAX_H / img.height, 1);
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      state.logoDataUrl = canvas.toDataURL('image/png', 0.85);
+      _updateLogoUI();
+      generatePreview();
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeLogo() {
+  state.logoDataUrl = null;
+  const input = document.getElementById('logo-file-input');
+  if (input) input.value = '';
+  _updateLogoUI();
+  generatePreview();
+}
+
+function _updateLogoUI() {
+  const uploadArea = document.getElementById('logo-upload-area');
+  const previewWrap = document.getElementById('logo-preview-wrap');
+  const previewImg = document.getElementById('logo-preview-img');
+  if (state.logoDataUrl) {
+    if (uploadArea) uploadArea.style.display = 'none';
+    if (previewWrap) previewWrap.style.display = '';
+    if (previewImg) previewImg.src = state.logoDataUrl;
+  } else {
+    if (uploadArea) uploadArea.style.display = '';
+    if (previewWrap) previewWrap.style.display = 'none';
+  }
+}
+
+// ─── ACCENT COLOR (Pro) ───────────────────────────────────────────────────────
+function selectColor(hex) {
+  if (!state.isPro) { showPaywall(); return; }
+  state.accentColor = hex;
+  document.querySelectorAll('.color-swatch').forEach(sw => {
+    sw.classList.toggle('color-swatch-active', sw.dataset.color === hex);
+  });
+  generatePreview();
+}
 
 // ─── PDF GENERATION (jsPDF + AutoTable) ─────────────────────────────────────
 function buildPDF() {
@@ -450,15 +533,27 @@ function buildPDF() {
   const pageW = 210;
   const colRight = pageW - margin;
   let y = margin;
+  const [cr, cg, cb] = hexToRgb(state.accentColor);
 
-  // Header: Firmenname left | ANGEBOT right
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.setTextColor(17, 24, 39);
-  doc.text(f.sFirma || 'Firmenname', margin, y);
+  // Header: Logo/Firmenname left | ANGEBOT right
+  if (state.isPro && state.logoDataUrl) {
+    try {
+      doc.addImage(state.logoDataUrl, 'PNG', margin, y - 4, 0, 12); // auto-width, 12mm tall
+    } catch {}
+    y += 10;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(17, 24, 39);
+    doc.text(f.sFirma || '', margin, y);
+  } else {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.setTextColor(17, 24, 39);
+    doc.text(f.sFirma || 'Firmenname', margin, y);
+  }
 
   doc.setFontSize(20);
-  doc.setTextColor(99, 102, 241);
+  doc.setTextColor(cr, cg, cb);
   doc.text('ANGEBOT', colRight, y, { align: 'right' });
   y += 7;
 
@@ -469,7 +564,7 @@ function buildPDF() {
   if (f.sStrasse) { doc.text(f.sStrasse, margin, y); y += 4.5; }
   if (f.sPlz || f.sOrt) { doc.text(`${f.sPlz} ${f.sOrt}`.trim(), margin, y); y += 4.5; }
   if (f.sTel) { doc.text(`Tel: ${f.sTel}`, margin, y); y += 4.5; }
-  if (f.sEmail) { doc.setTextColor(99, 102, 241); doc.text(f.sEmail, margin, y); doc.setTextColor(107, 114, 128); y += 4.5; }
+  if (f.sEmail) { doc.setTextColor(cr, cg, cb); doc.text(f.sEmail, margin, y); doc.setTextColor(107, 114, 128); y += 4.5; }
 
   // Meta info right
   let metaY = margin + 10;
@@ -488,8 +583,8 @@ function buildPDF() {
 
   y = Math.max(y, metaY) + 8;
 
-  // Divider line indigo
-  doc.setDrawColor(99, 102, 241);
+  // Divider line
+  doc.setDrawColor(cr, cg, cb);
   doc.setLineWidth(0.7);
   doc.line(margin, y, colRight, y);
   y += 8;
@@ -527,7 +622,7 @@ function buildPDF() {
     body: tableRows,
     margin: { left: margin, right: margin },
     styles: { fontSize: 9, cellPadding: 3, textColor: [17, 24, 39] },
-    headStyles: { fillColor: [99, 102, 241], textColor: [255, 255, 255], fontStyle: 'bold' },
+    headStyles: { fillColor: [cr, cg, cb], textColor: [255, 255, 255], fontStyle: 'bold' },
     alternateRowStyles: { fillColor: [248, 249, 255] },
     columnStyles: {
       0: { cellWidth: 8 },
@@ -552,13 +647,13 @@ function buildPDF() {
     doc.text(fmtEur(vatAmt), colRight, y, { align: 'right' });
     y += 5;
   }
-  doc.setDrawColor(99, 102, 241);
+  doc.setDrawColor(cr, cg, cb);
   doc.setLineWidth(0.5);
   doc.line(totalsX, y, colRight, y);
   y += 5;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.setTextColor(99, 102, 241);
+  doc.setTextColor(cr, cg, cb);
   doc.text('Gesamtbetrag', totalsX, y);
   doc.text(fmtEur(total), colRight, y, { align: 'right' });
   y += 8;
@@ -1167,7 +1262,7 @@ async function handleSendQuote() {
     return;
   }
 
-  if (!state.isPro && state.quoteCount >= FREE_LIMIT + state.bonusQuotes) {
+  if (!state.isPro) {
     showPaywall();
     return;
   }

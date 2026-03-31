@@ -721,6 +721,55 @@
         </div>
       </section>
 
+      <!-- Design (Pro) -->
+      <section style="margin-top:20px;animation:fadeUp 0.4s 0.08s ease both;opacity:0;animation-fill-mode:forwards">
+        <h3 style="font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+          Design
+          <span class="pro-badge">PRO</span>
+        </h3>
+        <div class="card" style="padding:16px">
+          <!-- Logo Upload -->
+          <div style="margin-bottom:16px">
+            <label style="font-size:12px;font-weight:500;color:var(--text);display:block;margin-bottom:8px">Firmenlogo</label>
+            <input type="file" id="logo-file-input" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="handleLogoUpload(event)">
+            <div id="logo-upload-area">
+              <button onclick="state.isPro ? document.getElementById('logo-file-input').click() : showPaywall()"
+                style="width:100%;padding:12px;border:1.5px dashed var(--border);border-radius:8px;background:#F8F9FF;cursor:pointer;font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font);transition:border-color 0.15s"
+                onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor=''">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Logo hochladen
+                <span style="font-size:10px;color:#9CA3AF">PNG / JPG, max. 2 MB</span>
+              </button>
+            </div>
+            <div id="logo-preview-wrap" style="display:none">
+              <div style="display:flex;align-items:center;gap:10px;padding:10px;border:1.5px solid var(--border);border-radius:8px;background:#F8F9FF">
+                <img id="logo-preview-img" src="" alt="Logo" style="max-height:40px;max-width:120px;object-fit:contain;border-radius:4px">
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:11px;font-weight:500;color:var(--text)">Logo hochgeladen</div>
+                  <button onclick="removeLogo()" style="font-size:11px;color:var(--danger);background:none;border:none;cursor:pointer;padding:0;font-family:var(--font);margin-top:2px">Entfernen</button>
+                </div>
+                <button onclick="document.getElementById('logo-file-input').click()"
+                  style="font-size:11px;color:var(--primary);background:none;border:1px solid rgba(99,102,241,0.25);cursor:pointer;padding:4px 10px;border-radius:6px;font-family:var(--font)">Ändern</button>
+              </div>
+            </div>
+          </div>
+          <!-- Accent Color -->
+          <div>
+            <label style="font-size:12px;font-weight:500;color:var(--text);display:block;margin-bottom:8px">Akzentfarbe</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="color-swatch color-swatch-active" data-color="#6366F1" onclick="selectColor('#6366F1')" style="background:#6366F1" title="Indigo"></button>
+              <button class="color-swatch" data-color="#2563EB" onclick="selectColor('#2563EB')" style="background:#2563EB" title="Blau"></button>
+              <button class="color-swatch" data-color="#0D9488" onclick="selectColor('#0D9488')" style="background:#0D9488" title="Türkis"></button>
+              <button class="color-swatch" data-color="#059669" onclick="selectColor('#059669')" style="background:#059669" title="Grün"></button>
+              <button class="color-swatch" data-color="#D97706" onclick="selectColor('#D97706')" style="background:#D97706" title="Amber"></button>
+              <button class="color-swatch" data-color="#E11D48" onclick="selectColor('#E11D48')" style="background:#E11D48" title="Rot"></button>
+              <button class="color-swatch" data-color="#7C3AED" onclick="selectColor('#7C3AED')" style="background:#7C3AED" title="Violett"></button>
+              <button class="color-swatch" data-color="#475569" onclick="selectColor('#475569')" style="background:#475569" title="Grau"></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Empfänger -->
       <section style="margin-top:20px;animation:fadeUp 0.4s 0.1s ease both;opacity:0;animation-fill-mode:forwards">
         <h3 style="font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">Empfänger</h3>
@@ -876,8 +925,8 @@
         <h3 style="font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em">Vorschau</h3>
         <span style="font-size:11px;color:var(--muted)">Live-Aktualisierung</span>
       </div>
-      <div id="preview-container" style="background:#fff;border:1.5px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow);min-height:500px;padding:24px;position:relative;transition:opacity 0.2s;overflow-x:hidden">
-        <div id="preview-content" style="font-family:'Inter',sans-serif;font-size:12px;line-height:1.5;color:#111827;max-width:100%"></div>
+      <div id="preview-container" style="background:#fff;border:1px solid #D1D5DB;border-radius:3px;box-shadow:0 2px 8px rgba(0,0,0,0.08),0 8px 32px rgba(0,0,0,0.06);padding:8.1% 9.5% 9.5% 11.9%;position:relative;transition:opacity 0.2s;overflow-x:hidden">
+        <div id="preview-content" style="font-family:'Inter',sans-serif;font-size:11px;line-height:1.55;color:#111827;max-width:100%"></div>
       </div>
     </div>
 
