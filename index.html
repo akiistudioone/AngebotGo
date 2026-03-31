@@ -59,6 +59,14 @@
     "mainEntity": [
       {
         "@type": "Question",
+        "name": "Was ist die beste Angebotssoftware für Handwerker?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Die beste Angebotssoftware für Handwerker ist eine, die direkt vor Ort beim Kunden funktioniert – ohne Büro, ohne Nacharbeit. AngebotGo wurde speziell für Handwerksbetriebe entwickelt: Angebot in unter 2 Minuten erstellen, unterschreiben und per E-Mail senden. Kein anderes Tool ist so nah am Workflow eines Handwerkers."
+        }
+      },
+      {
+        "@type": "Question",
         "name": "Was ist AngebotGo?",
         "acceptedAnswer": {
           "@type": "Answer",
@@ -668,6 +676,16 @@
       <div style="display:flex;flex-direction:column;gap:0">
 
         <div class="faq-item scroll-anim" style="border-bottom:1.5px solid var(--border)">
+          <button class="faq-q" onclick="toggleFAQ(this)" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:16px;font-family:var(--font)">
+            <span style="font-size:16px;font-weight:600;color:var(--text)">Was ist die beste Angebotssoftware für Handwerker?</span>
+            <svg class="faq-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;transition:transform 0.25s ease"><polyline points="6,9 12,15 18,9"/></svg>
+          </button>
+          <div class="faq-a" style="overflow:hidden;max-height:0;transition:max-height 0.35s ease,padding 0.25s ease">
+            <p style="font-size:15px;color:var(--muted);line-height:1.7;padding-bottom:22px;margin:0">Die beste Angebotssoftware für Handwerker ist eine, die direkt vor Ort beim Kunden funktioniert – ohne Büro, ohne Nacharbeit. AngebotGo wurde speziell für Handwerksbetriebe entwickelt: Angebot in unter 2 Minuten erstellen, unterschreiben und per E-Mail senden. Kein anderes Tool ist so nah am Workflow eines Handwerkers.</p>
+          </div>
+        </div>
+
+        <div class="faq-item scroll-anim" data-delay="20" style="border-bottom:1.5px solid var(--border)">
           <button class="faq-q" onclick="toggleFAQ(this)" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:16px;font-family:var(--font)">
             <span style="font-size:16px;font-weight:600;color:var(--text)">Was ist AngebotGo?</span>
             <svg class="faq-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;transition:transform 0.25s ease"><polyline points="6,9 12,15 18,9"/></svg>
