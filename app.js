@@ -679,6 +679,8 @@ async function goToEmailGate(pending) {
 }
 
 const VIEW_DISPLAY = { 'view-email': 'flex', 'view-landing': 'block', 'view-generator': 'flex', 'view-profile': 'block' };
+const VIEW_URLS = { 'view-email': '/login', 'view-landing': '/', 'view-generator': '/generator', 'view-profile': '/profil' };
+let _suppressHistory = false;
 
 function showView(id) {
   document.querySelectorAll('.view').forEach(v => {
@@ -690,7 +692,35 @@ function showView(id) {
     el.style.display = VIEW_DISPLAY[id] || 'block';
     el.classList.add('active');
   }
+  if (!_suppressHistory && VIEW_URLS[id]) {
+    history.pushState({ view: id }, '', VIEW_URLS[id]);
+  }
 }
+
+// Browser back/forward support
+window.addEventListener('popstate', function(e) {
+  const view = (e.state && e.state.view) || 'view-landing';
+  _suppressHistory = true;
+  if (view === 'view-generator') {
+    window.scrollTo(0, 0);
+    showView('view-generator');
+    setTimeout(initSignatureCanvas, 60);
+    updateCounter();
+    generatePreview();
+  } else if (view === 'view-profile') {
+    if (state.accessToken) {
+      showProfile();
+    } else {
+      showView('view-landing');
+      window.scrollTo(0, 0);
+      history.replaceState({ view: 'view-landing' }, '', '/');
+    }
+  } else {
+    showView(view);
+    if (view === 'view-landing') window.scrollTo(0, 0);
+  }
+  _suppressHistory = false;
+});
 
 // ─── AUTH TABS ────────────────────────────────────────────────────────────────
 function switchAuthTab(tab) {
@@ -1425,6 +1455,30 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
   }
+
+  // ── Initial URL-based routing ─────────────────────────────────────────────
+  const _initPath = window.location.pathname;
+  _suppressHistory = true;
+  if (_initPath === '/login') {
+    if (!state.accessToken) {
+      showView('view-email');
+    }
+  } else if (_initPath === '/generator') {
+    window.scrollTo(0, 0);
+    showView('view-generator');
+    setTimeout(initSignatureCanvas, 60);
+    updateCounter();
+    generatePreview();
+  } else if (_initPath === '/profil') {
+    if (state.accessToken) {
+      showProfile();
+    }
+    // Not logged in → stay on landing
+  }
+  _suppressHistory = false;
+  // Set initial history state so popstate works for the first page
+  const _initView = { '/': 'view-landing', '/login': 'view-email', '/generator': 'view-generator', '/profil': 'view-profile' }[_initPath] || 'view-landing';
+  history.replaceState({ view: _initView }, '', _initPath);
 });
 
 
@@ -1605,7 +1659,12 @@ function showStep(n, userClick) {
   for (let i = 1; i <= 3; i++) {
     const content = document.getElementById('step-content-' + i);
     const btn = document.getElementById('step-btn-' + i);
-    if (content) content.style.display = i === n ? '' : 'none';
+    if (content) {
+      const active = i === n;
+      content.style.visibility = active ? 'visible' : 'hidden';
+      content.style.opacity    = active ? '1' : '0';
+      content.style.pointerEvents = active ? 'auto' : 'none';
+    }
     if (btn) btn.classList.toggle('step-dark-active', i === n);
   }
   _clearStepTimers();

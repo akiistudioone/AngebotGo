@@ -57,7 +57,7 @@
   </nav>
 
   <!-- HERO SECTION -->
-  <section style="min-height:100vh;background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);display:flex;align-items:center;padding:100px 48px 80px;position:relative;overflow:hidden">
+  <section id="hero" style="min-height:100vh;background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);display:flex;align-items:center;padding:100px 48px 80px;position:relative;overflow:hidden">
     <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(99,102,241,0.15),transparent);pointer-events:none"></div>
     <div class="hero-grid" style="max-width:1100px;margin:0 auto;width:100%;display:grid;grid-template-columns:3fr 2fr;gap:80px;align-items:center">
       <!-- Left: text -->
@@ -235,7 +235,7 @@
           </button>
         </div>
         <!-- Step content -->
-        <div class="scroll-anim" data-delay="160" style="max-width:760px;margin:0 auto">
+        <div class="scroll-anim step-container" data-delay="160" style="max-width:760px;margin:0 auto">
 
           <!-- ── STEP 1: ANMELDEN ── -->
           <div id="step-content-1" class="step-content">
@@ -282,7 +282,7 @@
           </div>
 
           <!-- ── STEP 2: DATEN EINGEBEN ── -->
-          <div id="step-content-2" class="step-content" style="display:none">
+          <div id="step-content-2" class="step-content">
             <div class="smock-wrap">
               <div class="smock-chrome">
                 <span class="smock-dot" style="background:#FF5F57"></span>
@@ -355,7 +355,7 @@
           </div>
 
           <!-- ── STEP 3: ABSENDEN ── -->
-          <div id="step-content-3" class="step-content" style="display:none">
+          <div id="step-content-3" class="step-content">
             <div class="smock-wrap" style="position:relative;overflow:hidden">
               <div class="smock-chrome">
                 <span class="smock-dot" style="background:#FF5F57"></span>
@@ -404,7 +404,7 @@
   </section>
 
   <!-- VORHER / NACHHER SECTION -->
-  <section style="padding:120px 48px;background:#f8f9ff">
+  <section id="vergleich" style="padding:120px 48px;background:#f8f9ff">
     <div style="max-width:900px;margin:0 auto">
       <h2 class="scroll-anim" style="font-size:clamp(28px,3.5vw,40px);font-weight:700;color:var(--text);text-align:center;margin-bottom:52px">Der Unterschied im Alltag</h2>
       <div class="compare-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
@@ -431,7 +431,7 @@
   </section>
 
   <!-- FEATURE SECTION -->
-  <section style="padding:120px 48px;background:#fff">
+  <section id="funktionen" style="padding:120px 48px;background:#fff">
     <div style="max-width:1000px;margin:0 auto">
       <h2 class="scroll-anim" style="font-size:clamp(28px,3.5vw,40px);font-weight:700;color:var(--text);text-align:center;margin-bottom:60px">Alles, was du brauchst. Nichts, was du nicht brauchst.</h2>
       <div class="feat-grid-top" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:24px">
@@ -467,7 +467,7 @@
   </section>
 
   <!-- TARGET AUDIENCE SECTION -->
-  <section style="padding:120px 48px;background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);position:relative;overflow:hidden">
+  <section id="zielgruppe" style="padding:120px 48px;background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);position:relative;overflow:hidden">
     <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(99,102,241,0.12),transparent);pointer-events:none"></div>
     <div style="max-width:900px;margin:0 auto;text-align:center;position:relative;z-index:1">
       <h2 class="scroll-anim" style="font-size:clamp(28px,3.5vw,40px);font-weight:700;color:#fff;margin-bottom:52px">Gemacht für alle, die direkt beim Kunden arbeiten.</h2>
@@ -497,7 +497,7 @@
   </section>
 
   <!-- PRICING SECTION -->
-  <section style="padding:120px 48px;background:#f8f9ff">
+  <section id="preise" style="padding:120px 48px;background:#f8f9ff">
     <div style="max-width:720px;margin:0 auto">
       <h2 class="scroll-anim" style="font-size:clamp(28px,3.5vw,40px);font-weight:700;text-align:center;margin-bottom:12px">Einfache Preise</h2>
       <p class="scroll-anim" data-delay="60" style="text-align:center;color:var(--muted);font-size:16px;margin-bottom:52px">Starte kostenlos. Upgrade, wenn du regelmäßig Angebote schreibst.</p>
@@ -548,7 +548,7 @@
   </section>
 
   <!-- FINAL CTA SECTION -->
-  <section style="padding:120px 48px;background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);text-align:center">
+  <section id="cta" style="padding:120px 48px;background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);text-align:center">
     <div style="max-width:640px;margin:0 auto">
       <h2 class="scroll-anim" style="font-size:clamp(28px,3.5vw,48px);font-weight:700;color:#fff;margin-bottom:16px;line-height:1.15">Starte jetzt und erstelle dein erstes Angebot in 2 Minuten.</h2>
       <p class="scroll-anim" data-delay="80" style="font-size:17px;color:rgba(255,255,255,0.65);margin-bottom:40px">Kostenlos, ohne Kreditkarte, sofort loslegen.</p>
@@ -579,8 +579,8 @@
     <div style="display:flex;align-items:center;cursor:pointer" onclick="showView('view-landing');window.scrollTo({top:0,behavior:'smooth'})">
       <img src="/assets/logo-blue.png" alt="AngebotGo" style="height:32px;width:auto;display:block">
     </div>
-    <button onclick="showView('view-landing');window.scrollTo({top:0,behavior:'smooth'})"
-      style="padding:8px 18px;border-radius:999px;background:none;border:1.5px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;font-family:var(--font);color:var(--text);display:inline-flex;align-items:center;gap:6px">
+    <button id="back-to-landing-btn" onclick="showView('view-landing');window.scrollTo({top:0,behavior:'smooth'})"
+      style="padding:8px 18px;border-radius:999px;background:none;border:1.5px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;font-family:var(--font);color:var(--text);display:inline-flex;align-items:center;gap:6px;white-space:nowrap">
       ← Zurück zur Startseite
     </button>
   </nav>
