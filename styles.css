@@ -218,7 +218,9 @@
       section[style*="min-height:100vh"] div[style*="display:flex;gap:14px"] a { text-align: center !important; justify-content: center !important; }
       section[style*="padding:120px 48px"],
       section[style*="padding:100px 48px"],
+      section[style*="padding:96px 48px"],
       section[style*="padding:80px 48px"] { padding-left: 20px !important; padding-right: 20px !important; padding-top: 64px !important; padding-bottom: 64px !important; }
+      footer[style*="padding:32px 48px"] { padding-left: 20px !important; padding-right: 20px !important; }
       .hero-demo-mobile { padding-left: 20px !important; padding-right: 20px !important; }
       /* Help widget + Feedback-Banner: nicht über mobile Browser-UI */
       #help-widget { bottom: 16px !important; right: 16px !important; }

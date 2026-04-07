@@ -1260,91 +1260,156 @@
         <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:16px">Kein Download · Keine Kreditkarte · DSGVO-konform</p>
       </div>
     </div>
-    <div style="margin-top:64px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;font-size:12px;color:rgba(255,255,255,0.35)">
-      <span>© 2026 AngebotGo</span>
-      <a href="/agb" style="color:rgba(255,255,255,0.35);text-decoration:none">AGB</a>
-      <a href="/datenschutz" style="color:rgba(255,255,255,0.35);text-decoration:none">Datenschutz</a>
-      <a href="/impressum" style="color:rgba(255,255,255,0.35);text-decoration:none">Impressum</a>
+  </section>
+
+  <!-- RATGEBER / BLOG SECTION -->
+  <section id="ratgeber" style="padding:96px 48px;background:linear-gradient(180deg,#1a1740 0%,#0f0c29 100%)">
+    <div style="max-width:1140px;margin:0 auto">
+      <!-- Header -->
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:24px;margin-bottom:52px">
+        <div>
+          <div style="display:inline-flex;align-items:center;padding:4px 14px;border:1px solid rgba(255,255,255,0.18);border-radius:999px;font-size:12px;font-weight:500;color:rgba(255,255,255,0.65);margin-bottom:18px">Ratgeber</div>
+          <h2 class="scroll-anim" style="font-size:clamp(26px,3vw,40px);font-weight:700;color:#fff;line-height:1.15;margin:0">Wissen für Handwerker,<br>die vor Ort abschließen.</h2>
+        </div>
+      </div>
+      <!-- Cards grid -->
+      <div class="blog-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+
+        <!-- Card 1 -->
+        <article class="scroll-anim" style="border-radius:16px;overflow:hidden;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);transition:transform 0.25s,box-shadow 0.25s;cursor:pointer"
+          onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 20px 48px rgba(0,0,0,0.5)'"
+          onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <a href="#" style="text-decoration:none;display:block">
+            <div style="height:210px;overflow:hidden;background:#1e1b4b">
+              <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&h=420&fit=crop&auto=format" alt="Handwerker beim Kunden" loading="lazy"
+                style="width:100%;height:100%;object-fit:cover;opacity:0.85;transition:transform 0.4s;display:block"
+                onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform=''">
+            </div>
+            <div style="padding:22px 20px 24px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+                <span style="padding:3px 11px;border-radius:999px;background:rgba(99,102,241,0.18);border:1px solid rgba(99,102,241,0.35);font-size:11px;font-weight:600;color:#a5b4fc">Auftragsverlust</span>
+                <span style="font-size:11px;color:rgba(255,255,255,0.38)">5 min</span>
+              </div>
+              <h3 style="font-size:15px;font-weight:600;color:#fff;line-height:1.45;margin:0">Warum Handwerker Aufträge durch langsame Angebote verlieren</h3>
+            </div>
+          </a>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="scroll-anim" data-delay="80" style="border-radius:16px;overflow:hidden;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);transition:transform 0.25s,box-shadow 0.25s;cursor:pointer"
+          onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 20px 48px rgba(0,0,0,0.5)'"
+          onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <a href="#" style="text-decoration:none;display:block">
+            <div style="height:210px;overflow:hidden;background:#1e1b4b">
+              <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&h=420&fit=crop&auto=format" alt="Handwerker mit Smartphone" loading="lazy"
+                style="width:100%;height:100%;object-fit:cover;opacity:0.85;transition:transform 0.4s;display:block"
+                onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform=''">
+            </div>
+            <div style="padding:22px 20px 24px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+                <span style="padding:3px 11px;border-radius:999px;background:rgba(99,102,241,0.18);border:1px solid rgba(99,102,241,0.35);font-size:11px;font-weight:600;color:#a5b4fc">Vor-Ort-Angebot</span>
+                <span style="font-size:11px;color:rgba(255,255,255,0.38)">4 min</span>
+              </div>
+              <h3 style="font-size:15px;font-weight:600;color:#fff;line-height:1.45;margin:0">Angebot direkt beim Kunden erstellen – so geht's mit dem Smartphone</h3>
+            </div>
+          </a>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="scroll-anim" data-delay="160" style="border-radius:16px;overflow:hidden;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);transition:transform 0.25s,box-shadow 0.25s;cursor:pointer"
+          onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 20px 48px rgba(0,0,0,0.5)'"
+          onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <a href="#" style="text-decoration:none;display:block">
+            <div style="height:210px;overflow:hidden;background:#1e1b4b">
+              <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=420&fit=crop&auto=format" alt="Laptop mit Software" loading="lazy"
+                style="width:100%;height:100%;object-fit:cover;opacity:0.85;transition:transform 0.4s;display:block"
+                onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform=''">
+            </div>
+            <div style="padding:22px 20px 24px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+                <span style="padding:3px 11px;border-radius:999px;background:rgba(99,102,241,0.18);border:1px solid rgba(99,102,241,0.35);font-size:11px;font-weight:600;color:#a5b4fc">Vergleich</span>
+                <span style="font-size:11px;color:rgba(255,255,255,0.38)">6 min</span>
+              </div>
+              <h3 style="font-size:15px;font-weight:600;color:#fff;line-height:1.45;margin:0">Word & Excel vs. Angebotssoftware: Was ist wirklich besser?</h3>
+            </div>
+          </a>
+        </article>
+
+        <!-- Card 4 -->
+        <article class="scroll-anim" data-delay="0" style="border-radius:16px;overflow:hidden;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);transition:transform 0.25s,box-shadow 0.25s;cursor:pointer"
+          onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 20px 48px rgba(0,0,0,0.5)'"
+          onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <a href="#" style="text-decoration:none;display:block">
+            <div style="height:210px;overflow:hidden;background:#1e1b4b">
+              <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&h=420&fit=crop&auto=format" alt="Unterschrift auf Dokument" loading="lazy"
+                style="width:100%;height:100%;object-fit:cover;opacity:0.85;transition:transform 0.4s;display:block"
+                onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform=''">
+            </div>
+            <div style="padding:22px 20px 24px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+                <span style="padding:3px 11px;border-radius:999px;background:rgba(99,102,241,0.18);border:1px solid rgba(99,102,241,0.35);font-size:11px;font-weight:600;color:#a5b4fc">Digitale Unterschrift</span>
+                <span style="font-size:11px;color:rgba(255,255,255,0.38)">3 min</span>
+              </div>
+              <h3 style="font-size:15px;font-weight:600;color:#fff;line-height:1.45;margin:0">Angebot digital unterschreiben und direkt senden</h3>
+            </div>
+          </a>
+        </article>
+
+        <!-- Card 5 -->
+        <article class="scroll-anim" data-delay="80" style="border-radius:16px;overflow:hidden;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);transition:transform 0.25s,box-shadow 0.25s;cursor:pointer"
+          onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 20px 48px rgba(0,0,0,0.5)'"
+          onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <a href="#" style="text-decoration:none;display:block">
+            <div style="height:210px;overflow:hidden;background:#1e1b4b">
+              <img src="https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=600&h=420&fit=crop&auto=format" alt="Handwerker mit Werkzeug" loading="lazy"
+                style="width:100%;height:100%;object-fit:cover;opacity:0.85;transition:transform 0.4s;display:block"
+                onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform=''">
+            </div>
+            <div style="padding:22px 20px 24px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+                <span style="padding:3px 11px;border-radius:999px;background:rgba(99,102,241,0.18);border:1px solid rgba(99,102,241,0.35);font-size:11px;font-weight:600;color:#a5b4fc">Mobiles Arbeiten</span>
+                <span style="font-size:11px;color:rgba(255,255,255,0.38)">4 min</span>
+              </div>
+              <h3 style="font-size:15px;font-weight:600;color:#fff;line-height:1.45;margin:0">Mobiles Angebot im Handwerk: Werkzeug oder Spielerei?</h3>
+            </div>
+          </a>
+        </article>
+
+        <!-- Card 6 -->
+        <article class="scroll-anim" data-delay="160" style="border-radius:16px;overflow:hidden;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);transition:transform 0.25s,box-shadow 0.25s;cursor:pointer"
+          onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 20px 48px rgba(0,0,0,0.5)'"
+          onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <a href="#" style="text-decoration:none;display:block">
+            <div style="height:210px;overflow:hidden;background:#1e1b4b">
+              <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&h=420&fit=crop&auto=format" alt="Kalkulation und ROI" loading="lazy"
+                style="width:100%;height:100%;object-fit:cover;opacity:0.85;transition:transform 0.4s;display:block"
+                onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform=''">
+            </div>
+            <div style="padding:22px 20px 24px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+                <span style="padding:3px 11px;border-radius:999px;background:rgba(99,102,241,0.18);border:1px solid rgba(99,102,241,0.35);font-size:11px;font-weight:600;color:#a5b4fc">Kosten & ROI</span>
+                <span style="font-size:11px;color:rgba(255,255,255,0.38)">5 min</span>
+              </div>
+              <h3 style="font-size:15px;font-weight:600;color:#fff;line-height:1.45;margin:0">Was kostet Angebotssoftware – und wann rechnet sie sich?</h3>
+            </div>
+          </a>
+        </article>
+
+      </div>
     </div>
   </section>
 
-  <!-- SEO BLOG / CONTENT SECTION -->
-  <section id="ratgeber" style="padding:52px 48px;background:#fff;border-top:1px solid var(--border)">
-    <div style="max-width:760px;margin:0 auto">
-      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:24px">
-        <h2 class="scroll-anim" style="font-size:16px;font-weight:700;color:var(--text)">Ratgeber & Wissen</h2>
-        <span style="font-size:13px;color:var(--muted);white-space:nowrap">für Unternehmer, die vor Ort abschließen</span>
-      </div>
-      <div class="scroll-anim" style="display:flex;flex-direction:column">
-        <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--border);text-decoration:none;transition:background 0.15s"
-          onmouseover="this.style.paddingLeft='8px'" onmouseout="this.style.paddingLeft='0'">
-          <div style="display:flex;align-items:center;gap:12px;min-width:0">
-            <span style="font-size:16px;flex-shrink:0">⚡</span>
-            <div>
-              <div style="font-size:14px;font-weight:600;color:var(--text);line-height:1.3">Warum Unternehmer Aufträge durch langsame Angebote verlieren</div>
-              <div style="font-size:12px;color:var(--muted);margin-top:2px">Auftragsverlust · 5 min</div>
-            </div>
-          </div>
-          <span style="font-size:13px;color:var(--primary);flex-shrink:0">→</span>
-        </a>
-        <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--border);text-decoration:none;transition:padding 0.15s"
-          onmouseover="this.style.paddingLeft='8px'" onmouseout="this.style.paddingLeft='0'">
-          <div style="display:flex;align-items:center;gap:12px;min-width:0">
-            <span style="font-size:16px;flex-shrink:0">📱</span>
-            <div>
-              <div style="font-size:14px;font-weight:600;color:var(--text);line-height:1.3">Angebot direkt beim Kunden erstellen – so geht's</div>
-              <div style="font-size:12px;color:var(--muted);margin-top:2px">Vor-Ort-Angebot · 4 min</div>
-            </div>
-          </div>
-          <span style="font-size:13px;color:var(--primary);flex-shrink:0">→</span>
-        </a>
-        <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--border);text-decoration:none;transition:padding 0.15s"
-          onmouseover="this.style.paddingLeft='8px'" onmouseout="this.style.paddingLeft='0'">
-          <div style="display:flex;align-items:center;gap:12px;min-width:0">
-            <span style="font-size:16px;flex-shrink:0">📄</span>
-            <div>
-              <div style="font-size:14px;font-weight:600;color:var(--text);line-height:1.3">Word & Excel vs. Angebotssoftware: Was ist besser?</div>
-              <div style="font-size:12px;color:var(--muted);margin-top:2px">Vergleich · 6 min</div>
-            </div>
-          </div>
-          <span style="font-size:13px;color:var(--primary);flex-shrink:0">→</span>
-        </a>
-        <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--border);text-decoration:none;transition:padding 0.15s"
-          onmouseover="this.style.paddingLeft='8px'" onmouseout="this.style.paddingLeft='0'">
-          <div style="display:flex;align-items:center;gap:12px;min-width:0">
-            <span style="font-size:16px;flex-shrink:0">✍️</span>
-            <div>
-              <div style="font-size:14px;font-weight:600;color:var(--text);line-height:1.3">Angebot digital unterschreiben und direkt senden</div>
-              <div style="font-size:12px;color:var(--muted);margin-top:2px">Digitale Unterschrift · 3 min</div>
-            </div>
-          </div>
-          <span style="font-size:13px;color:var(--primary);flex-shrink:0">→</span>
-        </a>
-        <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--border);text-decoration:none;transition:padding 0.15s"
-          onmouseover="this.style.paddingLeft='8px'" onmouseout="this.style.paddingLeft='0'">
-          <div style="display:flex;align-items:center;gap:12px;min-width:0">
-            <span style="font-size:16px;flex-shrink:0">🔨</span>
-            <div>
-              <div style="font-size:14px;font-weight:600;color:var(--text);line-height:1.3">Mobiles Angebot im Handwerk: Werkzeug oder Spielerei?</div>
-              <div style="font-size:12px;color:var(--muted);margin-top:2px">Mobiles Arbeiten · 4 min</div>
-            </div>
-          </div>
-          <span style="font-size:13px;color:var(--primary);flex-shrink:0">→</span>
-        </a>
-        <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;text-decoration:none;transition:padding 0.15s"
-          onmouseover="this.style.paddingLeft='8px'" onmouseout="this.style.paddingLeft='0'">
-          <div style="display:flex;align-items:center;gap:12px;min-width:0">
-            <span style="font-size:16px;flex-shrink:0">💰</span>
-            <div>
-              <div style="font-size:14px;font-weight:600;color:var(--text);line-height:1.3">Was kostet Angebotssoftware – und wann rechnet sie sich?</div>
-              <div style="font-size:12px;color:var(--muted);margin-top:2px">Kosten & ROI · 5 min</div>
-            </div>
-          </div>
-          <span style="font-size:13px;color:var(--primary);flex-shrink:0">→</span>
-        </a>
+  <!-- FOOTER -->
+  <footer style="background:#0a0820;padding:32px 48px;border-top:1px solid rgba(255,255,255,0.07)">
+    <div style="max-width:1140px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+      <span style="font-size:12px;color:rgba(255,255,255,0.3)">© 2026 AngebotGo</span>
+      <div style="display:flex;align-items:center;gap:20px">
+        <a href="/agb" style="font-size:12px;color:rgba(255,255,255,0.3);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">AGB</a>
+        <a href="/datenschutz" style="font-size:12px;color:rgba(255,255,255,0.3);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">Datenschutz</a>
+        <a href="/impressum" style="font-size:12px;color:rgba(255,255,255,0.3);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">Impressum</a>
       </div>
     </div>
-  </section>
+  </footer>
 
 </div><!-- /view-landing -->
 
