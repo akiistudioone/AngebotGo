@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socrates — Willkommen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/orb.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script>
+    window.SOCRATES_CONFIG = {
+      supabaseUrl: '%%SUPABASE_URL%%',
+      supabaseAnonKey: '%%SUPABASE_ANON_KEY%%',
+    };
+  </script>
+</head>
+<body>
+
+<div class="onboarding-shell" id="onboarding-main">
+
+  <!-- Progress Dots -->
+  <div class="onboarding-progress" id="progress-bar">
+    <div class="onboarding-dot active" id="dot-1"></div>
+    <div class="onboarding-dot" id="dot-2"></div>
+    <div class="onboarding-dot" id="dot-3"></div>
+  </div>
+
+  <!-- Step 1: Name -->
+  <div class="onboarding-content" id="step-1">
+    <h1 class="onboarding-title">Wie darf ich dich nennen?</h1>
+    <div>
+      <div class="input-wrap">
+        <input
+          type="text"
+          id="name-input"
+          class="input"
+          placeholder="Dein Name"
+          autocomplete="given-name"
+          maxlength="50"
+        >
+      </div>
+    </div>
+    <div class="onboarding-footer">
+      <button class="btn btn-primary btn-full" id="step1-next" disabled>
+        Weiter
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 2: Motivation (hidden) -->
+  <div class="onboarding-content" id="step-2" style="display:none">
+    <h1 class="onboarding-title">Was bringt dich hierher?</h1>
+    <div class="choice-grid">
+      <div class="choice-card" data-value="verloren">
+        Ich verliere mich<br>im Alltag
+      </div>
+      <div class="choice-card" data-value="klarheit">
+        Ich will klarer<br>denken
+      </div>
+      <div class="choice-card" data-value="weg">
+        Ich suche nach<br>meinem Weg
+      </div>
+      <div class="choice-card" data-value="muster">
+        Ich will meine<br>Muster verstehen
+      </div>
+    </div>
+    <div class="onboarding-footer">
+      <button class="btn btn-primary btn-full" id="step2-next" disabled>
+        Weiter
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 3: Uhrzeit (hidden) -->
+  <div class="onboarding-content" id="step-3" style="display:none">
+    <h1 class="onboarding-title">Wann möchtest du reflektieren?</h1>
+    <div class="time-grid">
+      <div class="time-option" data-value="morgen">
+        <div class="time-option-icon">☀</div>
+        <div class="time-option-label">Morgen</div>
+      </div>
+      <div class="time-option" data-value="mittag">
+        <div class="time-option-icon">◑</div>
+        <div class="time-option-label">Mittag</div>
+      </div>
+      <div class="time-option" data-value="abend">
+        <div class="time-option-icon">☽</div>
+        <div class="time-option-label">Abend</div>
+      </div>
+    </div>
+    <div class="onboarding-footer">
+      <button class="btn btn-primary btn-full" id="step3-next" disabled>
+        Beginnen
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 4: Orb-Geburt (hidden) -->
+  <div class="birth-screen" id="step-birth" style="display:none">
+    <div class="orb-container" id="birth-orb-container" style="min-height:260px;flex:none"></div>
+    <p class="birth-text" id="birth-text" style="opacity:0">
+      Deine Seele erwacht.<br>Lass uns beginnen.
+    </p>
+    <button class="btn btn-ghost" id="birth-continue" style="opacity:0">
+      Zur App
+    </button>
+  </div>
+
+</div>
+
+<script type="module">
+  import { guardRoute, navigate } from './js/router.js';
+  import { updateProfile, ensureProfile } from './js/supabase.js';
+  import { Orb } from './js/orb.js';
+  import { sanitizeText, showToast } from './js/app.js';
+
+  let ctx = await guardRoute();
+  if (!ctx) {
+    // Weiterleitung läuft
+  } else {
+    initOnboarding(ctx.user, ctx.profile);
+  }
+
+  function initOnboarding(user, profile) {
+    let currentStep = 1;
+    let selectedMotivation = '';
+    let selectedTime = '';
+    let userName = '';
+
+    const dots = [
+      document.getElementById('dot-1'),
+      document.getElementById('dot-2'),
+      document.getElementById('dot-3'),
+    ];
+
+    // --- STEP 1: Name ---
+    const nameInput = document.getElementById('name-input');
+    const step1Next = document.getElementById('step1-next');
+
+    nameInput.addEventListener('input', () => {
+      const val = sanitizeText(nameInput.value);
+      step1Next.disabled = val.length < 2;
+    });
+
+    nameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !step1Next.disabled) step1Next.click();
+    });
+
+    step1Next.addEventListener('click', async () => {
+      userName = sanitizeText(nameInput.value);
+      step1Next.classList.add('loading');
+      step1Next.disabled = true;
+      try {
+        await updateProfile(user.id, { name: userName });
+        goToStep(2);
+      } catch {
+        showToast('Fehler beim Speichern. Bitte versuche es erneut.', 'error');
+      } finally {
+        step1Next.classList.remove('loading');
+        step1Next.disabled = false;
+      }
+    });
+
+    // --- STEP 2: Motivation ---
+    const step2Next = document.getElementById('step2-next');
+    const choiceCards = document.querySelectorAll('#step-2 .choice-card');
+
+    choiceCards.forEach(card => {
+      card.addEventListener('click', () => {
+        choiceCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        selectedMotivation = card.dataset.value;
+        step2Next.disabled = false;
+      });
+    });
+
+    step2Next.addEventListener('click', () => goToStep(3));
+
+    // --- STEP 3: Zeit ---
+    const step3Next = document.getElementById('step3-next');
+    const timeOptions = document.querySelectorAll('.time-option');
+
+    timeOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        timeOptions.forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        selectedTime = opt.dataset.value;
+        step3Next.disabled = false;
+      });
+    });
+
+    step3Next.addEventListener('click', async () => {
+      step3Next.classList.add('loading');
+      step3Next.disabled = true;
+
+      try {
+        await updateProfile(user.id, {
+          reflection_time: selectedTime,
+          motivation: selectedMotivation,
+        });
+        goToBirth();
+      } catch {
+        showToast('Fehler beim Speichern.', 'error');
+        step3Next.classList.remove('loading');
+        step3Next.disabled = false;
+      }
+    });
+
+    // --- BIRTH SCREEN ---
+    async function goToBirth() {
+      document.getElementById('step-3').style.display = 'none';
+      document.getElementById('progress-bar').style.display = 'none';
+
+      const birthScreen = document.getElementById('step-birth');
+      birthScreen.style.display = 'flex';
+
+      // Orb erstellen und animieren
+      const orb = new Orb('#birth-orb-container');
+      orb.setEnergy(1.0);
+
+      // Kleiner Delay dann Geburt
+      await sleep(300);
+      orb.birth();
+
+      // Text einblenden
+      await sleep(1000);
+      const birthText = document.getElementById('birth-text');
+      birthText.style.transition = 'opacity 1s ease';
+      birthText.style.opacity = '1';
+
+      // Button einblenden
+      await sleep(1500);
+      const birthContinue = document.getElementById('birth-continue');
+      birthContinue.style.transition = 'opacity 0.8s ease';
+      birthContinue.style.opacity = '1';
+
+      birthContinue.addEventListener('click', async () => {
+        birthContinue.classList.add('loading');
+        try {
+          await updateProfile(user.id, { onboarding_done: true });
+          navigate('app');
+        } catch {
+          showToast('Fehler. Bitte versuche es erneut.', 'error');
+          birthContinue.classList.remove('loading');
+        }
+      });
+    }
+
+    // --- STEP NAVIGATION ---
+    function goToStep(step) {
+      document.getElementById(`step-${currentStep}`).style.display = 'none';
+      currentStep = step;
+
+      // Dots aktualisieren
+      dots.forEach((dot, i) => {
+        dot.classList.remove('active', 'done');
+        if (i + 1 < step) dot.classList.add('done');
+        if (i + 1 === step) dot.classList.add('active');
+      });
+
+      const stepEl = document.getElementById(`step-${step}`);
+      stepEl.style.display = 'flex';
+      stepEl.classList.add('fade-in-up');
+    }
+
+    function sleep(ms) {
+      return new Promise(r => setTimeout(r, ms));
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socrates</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/orb.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script>
+    window.SOCRATES_CONFIG = {
+      supabaseUrl: '%%SUPABASE_URL%%',
+      supabaseAnonKey: '%%SUPABASE_ANON_KEY%%',
+    };
+  </script>
+</head>
+<body>
+
+<div class="app-shell" id="app-main">
+
+  <!-- Header -->
+  <header class="app-header">
+    <span class="app-header-date" id="header-date"></span>
+    <span class="app-header-logo">Socrates</span>
+    <div class="app-header-streak">
+      <span class="streak-fire">🔥</span>
+      <span class="streak-count" id="streak-count">0</span>
+    </div>
+  </header>
+
+  <!-- Main: Today Screen -->
+  <main class="app-main" id="home-content">
+
+    <div class="home-screen">
+
+      <!-- Orb Section -->
+      <div class="home-orb-section">
+        <div class="orb-container" id="main-orb-container"></div>
+
+        <!-- Orb Status -->
+        <div class="orb-status">
+          <p class="orb-status-text" id="orb-status-text">Lade...</p>
+          <div class="orb-energy-bar">
+            <div class="orb-energy-fill" id="orb-energy-fill" style="width:100%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA Section -->
+      <div class="home-cta-section">
+        <button class="btn btn-primary btn-full" id="reflect-btn">
+          Jetzt reflektieren
+        </button>
+
+        <!-- Letzte Erkenntnis -->
+        <div class="home-last-insight" id="last-insight-block" style="display:none">
+          <p class="home-last-insight-label">Letzte Erkenntnis</p>
+          <p class="home-last-insight-text" id="last-insight-text"></p>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav" aria-label="Hauptnavigation">
+    <a href="app.html" class="nav-item active" id="nav-today" aria-label="Heute">
+      <span class="nav-icon">◎</span>
+      <span class="nav-label">Heute</span>
+    </a>
+    <a href="insights.html" class="nav-item" id="nav-insights" aria-label="Erkenntnisse">
+      <span class="nav-icon">◇</span>
+      <span class="nav-label">Erkenntnisse</span>
+    </a>
+    <a href="settings.html" class="nav-item" id="nav-settings" aria-label="Einstellungen">
+      <span class="nav-icon">◱</span>
+      <span class="nav-label">Einstellungen</span>
+    </a>
+  </nav>
+
+</div>
+
+<script type="module">
+  import { guardRoute } from './js/router.js';
+  import {
+    getTodaySession,
+    updateOrbEnergy,
+    getProfile,
+  } from './js/supabase.js';
+  import { Orb } from './js/orb.js';
+  import {
+    formatDate,
+    daysSince,
+    showToast,
+    initPage,
+  } from './js/app.js';
+  import { getStreakInfo, loadAndRenderInsights } from './js/insights.js';
+
+  // Guard
+  const ctx = await guardRoute();
+  if (!ctx) {
+    // Weiterleitung läuft
+  } else {
+    await initApp(ctx.user, ctx.profile);
+  }
+
+  async function initApp(user, profile) {
+    initPage(document.getElementById('app-main'));
+
+    // Datum
+    document.getElementById('header-date').textContent = formatDate(new Date());
+
+    // Orb-Energie aktualisieren (Decay falls nötig)
+    const energy = await updateOrbEnergy(user.id);
+    const freshProfile = await getProfile(user.id);
+
+    // Streak
+    const streak = freshProfile.streak_count || 0;
+    document.getElementById('streak-count').textContent = streak;
+
+    // Orb rendern
+    const orb = new Orb('#main-orb-container');
+    orb.setEnergy(freshProfile.orb_energy || 1.0);
+    orb.renderEnergyBar('#orb-energy-fill');
+
+    // Tremor bei langer Abwesenheit
+    const sinceSession = daysSince(freshProfile.last_session_date);
+    if (sinceSession >= 7) {
+      orb.tremor();
+    }
+
+    // Status Text
+    const statusText = sinceSession > 1
+      ? orb.getAbsenceStatusText(sinceSession)
+      : orb.getStatusText();
+    document.getElementById('orb-status-text').textContent = statusText;
+
+    // Heutige Session prüfen
+    const todaySession = await getTodaySession(user.id);
+    const reflectBtn = document.getElementById('reflect-btn');
+
+    if (todaySession?.completed) {
+      reflectBtn.disabled = true;
+      reflectBtn.textContent = 'Bis morgen';
+      orb.stopTremor();
+    } else {
+      reflectBtn.addEventListener('click', () => {
+        window.location.href = 'reflection.html';
+      });
+    }
+
+    // Letzte Erkenntnis
+    try {
+      const insights = await loadAndRenderInsights(user.id);
+      if (insights.length > 0) {
+        const last = insights[0];
+        document.getElementById('last-insight-text').textContent = last.content;
+        document.getElementById('last-insight-block').style.display = 'block';
+      }
+    } catch {
+      // Insights nicht kritisch
+    }
+  }
+</script>
+
+</body>
+</html>

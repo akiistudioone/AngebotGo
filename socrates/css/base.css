@@ -1,0 +1,203 @@
+/* ============================================================
+   SOCRATES — BASE CSS
+   Reset · Variablen · Typografie · Utilities
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@400;500&display=swap');
+
+/* ---- Reset ---- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img, video, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+input, textarea, select { font: inherit; color: inherit; background: none; border: none; outline: none; }
+ul, ol { list-style: none; }
+
+/* ---- CSS Custom Properties ---- */
+:root {
+  /* Farben */
+  --bg-primary:      #080808;
+  --bg-secondary:    #111111;
+  --bg-card:         #161616;
+  --text-primary:    #F0EDE8;
+  --text-secondary:  #888880;
+  --text-muted:      #444440;
+  --accent-gold:     #C9A96E;
+  --accent-gold-dim: #7A6140;
+  --orb-high:        #E8D5A8;
+  --orb-mid:         #8E9BAE;
+  --orb-low:         #3A3A3A;
+  --border:          rgba(255,255,255,0.06);
+  --border-active:   rgba(255,255,255,0.15);
+
+  /* Spacing (8px Grid) */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 40px;
+  --space-6: 48px;
+  --space-8: 64px;
+  --space-10: 80px;
+  --space-12: 96px;
+
+  /* Typografie */
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body:    'DM Sans', sans-serif;
+
+  /* Radius */
+  --radius-sm: 2px;
+  --radius:    4px;
+  --radius-lg: 8px;
+
+  /* Transitions */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: 0.3s var(--ease);
+
+  /* Layout */
+  --max-w: 430px;
+  --nav-h: 64px;
+  --header-h: 56px;
+}
+
+/* ---- Typografie ---- */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+h1 { font-size: clamp(2.5rem, 8vw, 4rem); }
+h2 { font-size: clamp(1.8rem, 5vw, 2.4rem); }
+h3 { font-size: 1.4rem; }
+h4 { font-size: 1.1rem; }
+
+p { line-height: 1.7; }
+
+.text-display {
+  font-family: var(--font-display);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+}
+
+.text-muted  { color: var(--text-muted); }
+.text-secondary { color: var(--text-secondary); }
+.text-gold   { color: var(--accent-gold); }
+.text-center { text-align: center; }
+.text-small  { font-size: 0.85rem; letter-spacing: 0.04em; }
+.text-upper  { text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.75rem; }
+
+/* ---- Noise Texture Overlay ---- */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  background-size: 256px;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.4;
+}
+
+/* ---- Layout Utilities ---- */
+.container {
+  max-width: var(--max-w);
+  margin-inline: auto;
+  padding-inline: var(--space-3);
+}
+
+.flex   { display: flex; }
+.grid   { display: grid; }
+.col    { flex-direction: column; }
+.center { align-items: center; justify-content: center; }
+.between { justify-content: space-between; }
+.gap-1  { gap: var(--space-1); }
+.gap-2  { gap: var(--space-2); }
+.gap-3  { gap: var(--space-3); }
+
+.full-h { min-height: 100dvh; }
+.full-w { width: 100%; }
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}
+
+/* ---- Divider ---- */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin-block: var(--space-3);
+}
+
+/* ---- Page Transitions ---- */
+.page-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.page-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+}
+
+/* ---- Loading Spinner ---- */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--border-active);
+  border-top-color: var(--accent-gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- Fade In Up ---- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.5s var(--ease) forwards;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-active); border-radius: 2px; }
+
+/* ---- Selection ---- */
+::selection {
+  background: var(--accent-gold-dim);
+  color: var(--text-primary);
+}

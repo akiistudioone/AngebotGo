@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socrates — Erkenntnisse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/orb.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script>
+    window.SOCRATES_CONFIG = {
+      supabaseUrl: '%%SUPABASE_URL%%',
+      supabaseAnonKey: '%%SUPABASE_ANON_KEY%%',
+    };
+  </script>
+</head>
+<body>
+
+<div class="app-shell" id="insights-main">
+
+  <!-- Header -->
+  <header class="app-header">
+    <span class="app-header-date"></span>
+    <span class="app-header-logo">Socrates</span>
+    <span></span>
+  </header>
+
+  <!-- Main -->
+  <main class="app-main">
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="erkenntnisse">Erkenntnisse</button>
+      <button class="tab-btn" data-tab="muster">Muster</button>
+      <button class="tab-btn" data-tab="verlauf">Verlauf</button>
+    </div>
+
+    <!-- Tab: Erkenntnisse -->
+    <div class="tab-panel active" id="tab-erkenntnisse">
+
+      <!-- Filter -->
+      <div style="display:flex;gap:var(--space-1);margin-bottom:var(--space-3)">
+        <button class="btn btn-sm btn-ghost filter-btn active" data-filter="all">Alle</button>
+        <button class="btn btn-sm btn-ghost filter-btn" data-filter="starred">★ Favoriten</button>
+      </div>
+
+      <div id="insights-list">
+        <div class="empty-state">
+          <div class="spinner" style="margin:0 auto var(--space-2)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Muster -->
+    <div class="tab-panel" id="tab-muster">
+      <div id="patterns-list">
+        <div class="empty-state">
+          <div class="spinner" style="margin:0 auto var(--space-2)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Verlauf -->
+    <div class="tab-panel" id="tab-verlauf">
+
+      <!-- Stats -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-2);margin-bottom:var(--space-3)">
+        <div class="card" style="text-align:center;padding:var(--space-2)">
+          <p class="text-display" style="font-size:1.8rem" id="stat-streak">—</p>
+          <p class="text-small text-muted">Streak</p>
+        </div>
+        <div class="card" style="text-align:center;padding:var(--space-2)">
+          <p class="text-display" style="font-size:1.8rem" id="stat-total">—</p>
+          <p class="text-small text-muted">Sessions</p>
+        </div>
+        <div class="card" style="text-align:center;padding:var(--space-2)">
+          <p class="text-display" style="font-size:1.8rem" id="stat-energy">—</p>
+          <p class="text-small text-muted">Energie</p>
+        </div>
+      </div>
+
+      <!-- Kalender -->
+      <div style="margin-bottom:var(--space-3)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-2)">
+          <button class="btn-icon" id="cal-prev" aria-label="Vorheriger Monat">‹</button>
+          <p class="text-small text-secondary" id="cal-month-label"></p>
+          <button class="btn-icon" id="cal-next" aria-label="Nächster Monat">›</button>
+        </div>
+        <div id="calendar-container"></div>
+      </div>
+
+      <!-- Energie-Verlauf -->
+      <div>
+        <p class="text-small text-muted" style="margin-bottom:var(--space-1)">Orb-Energie Verlauf</p>
+        <div id="energy-chart-container">
+          <p class="text-muted text-small">Nicht genug Daten.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav" aria-label="Hauptnavigation">
+    <a href="app.html" class="nav-item" id="nav-today" aria-label="Heute">
+      <span class="nav-icon">◎</span>
+      <span class="nav-label">Heute</span>
+    </a>
+    <a href="insights.html" class="nav-item active" id="nav-insights" aria-label="Erkenntnisse">
+      <span class="nav-icon">◇</span>
+      <span class="nav-label">Erkenntnisse</span>
+    </a>
+    <a href="settings.html" class="nav-item" id="nav-settings" aria-label="Einstellungen">
+      <span class="nav-icon">◱</span>
+      <span class="nav-label">Einstellungen</span>
+    </a>
+  </nav>
+
+</div>
+
+<script type="module">
+  import { guardRoute } from './js/router.js';
+  import {
+    loadAndRenderInsights,
+    renderInsightCard,
+    handleStarToggle,
+    loadAndRenderPatterns,
+    renderPatternCard,
+    renderCalendar,
+    renderEnergyChart,
+    getStreakInfo,
+  } from './js/insights.js';
+  import { acknowledgePattern } from './js/supabase.js';
+  import { showToast, initPage } from './js/app.js';
+
+  const ctx = await guardRoute();
+  if (!ctx) {
+    // Weiterleitung
+  } else {
+    initInsights(ctx.user, ctx.profile);
+  }
+
+  async function initInsights(user, profile) {
+    initPage(document.getElementById('insights-main'));
+
+    // Tabs
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabPanels.forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+      });
+    });
+
+    // Erkenntnisse laden
+    await loadInsights(user.id, 'all');
+
+    // Filter
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        loadInsights(user.id, btn.dataset.filter);
+      });
+    });
+
+    // Muster laden
+    await loadPatterns(user.id);
+
+    // Verlauf
+    await loadVerlauf(user.id);
+  }
+
+  async function loadInsights(userId, filter) {
+    const list = document.getElementById('insights-list');
+    list.innerHTML = '<div class="empty-state"><div class="spinner" style="margin:0 auto"></div></div>';
+
+    try {
+      const insights = await loadAndRenderInsights(userId, filter);
+
+      if (insights.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">◇</div>
+            <p>${filter === 'starred' ? 'Keine Favoriten. Markiere AHA-Momente mit einem Stern.' : 'Noch keine Erkenntnisse. Starte deine erste Reflexion.'}</p>
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = insights.map(i => renderInsightCard(i)).join('');
+
+      // Star-Interaktionen
+      list.querySelectorAll('.star-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.insightId;
+          const isStarred = btn.classList.contains('starred');
+
+          try {
+            await handleStarToggle(id, isStarred);
+            btn.classList.toggle('starred');
+            btn.textContent = isStarred ? '☆' : '★';
+          } catch {
+            showToast('Fehler beim Speichern.', 'error');
+          }
+        });
+      });
+
+    } catch {
+      list.innerHTML = '<div class="empty-state"><p>Fehler beim Laden.</p></div>';
+    }
+  }
+
+  async function loadPatterns(userId) {
+    const list = document.getElementById('patterns-list');
+    list.innerHTML = '<div class="empty-state"><div class="spinner" style="margin:0 auto"></div></div>';
+
+    try {
+      const patterns = await loadAndRenderPatterns(userId);
+
+      if (patterns.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">◐</div>
+            <p>Noch keine Muster erkannt. Muster werden nach 5 Sessions sichtbar.</p>
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = patterns.map(p => renderPatternCard(p)).join('');
+
+      // Muster als gesehen markieren
+      patterns.filter(p => !p.acknowledged).forEach(async (p) => {
+        try {
+          await acknowledgePattern(p.id);
+        } catch {
+          // nicht kritisch
+        }
+      });
+
+    } catch {
+      list.innerHTML = '<div class="empty-state"><p>Fehler beim Laden.</p></div>';
+    }
+  }
+
+  async function loadVerlauf(userId) {
+    // Stats
+    try {
+      const info = await getStreakInfo(userId);
+      document.getElementById('stat-streak').textContent = `${info.streak}🔥`;
+      document.getElementById('stat-total').textContent = info.totalSessions;
+      document.getElementById('stat-energy').textContent = `${Math.round(info.orbEnergy * 100)}%`;
+    } catch {}
+
+    // Kalender
+    const now = new Date();
+    let year = now.getFullYear();
+    let month = now.getMonth() + 1;
+
+    async function renderCal() {
+      const monthNames = [
+        'Januar','Februar','März','April','Mai','Juni',
+        'Juli','August','September','Oktober','November','Dezember'
+      ];
+      document.getElementById('cal-month-label').textContent =
+        `${monthNames[month - 1]} ${year}`;
+
+      const html = await renderCalendar(userId, year, month);
+      document.getElementById('calendar-container').innerHTML = html;
+    }
+
+    await renderCal();
+
+    document.getElementById('cal-prev').addEventListener('click', async () => {
+      month--;
+      if (month < 1) { month = 12; year--; }
+      await renderCal();
+    });
+
+    document.getElementById('cal-next').addEventListener('click', async () => {
+      month++;
+      if (month > 12) { month = 1; year++; }
+      await renderCal();
+    });
+
+    // Energie Chart
+    try {
+      const chartHtml = await renderEnergyChart(userId);
+      if (chartHtml) {
+        document.getElementById('energy-chart-container').innerHTML = chartHtml;
+      }
+    } catch {}
+  }
+</script>
+
+</body>
+</html>

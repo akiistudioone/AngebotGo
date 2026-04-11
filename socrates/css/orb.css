@@ -1,0 +1,287 @@
+/* ============================================================
+   SOCRATES — ORB CSS
+   Die lebendige Seele — Zustände, Animationen, Pulsieren
+   ============================================================ */
+
+/* ---- ORB WRAPPER ---- */
+.orb-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  flex: 1;
+  min-height: 280px;
+}
+
+.orb-scene {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---- ORB CORE ---- */
+.orb {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  animation: orbBreath 4s ease-in-out infinite;
+  cursor: pointer;
+  transition: filter 0.6s var(--ease);
+}
+
+/* ---- ORB LAYERS ---- */
+.orb-layer {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+/* Base glow */
+.orb-base {
+  background: radial-gradient(circle at 38% 35%,
+    var(--orb-core-bright) 0%,
+    var(--orb-core-mid) 35%,
+    var(--orb-core-dark) 70%,
+    transparent 100%
+  );
+}
+
+/* Inner pulse */
+.orb-inner {
+  background: radial-gradient(circle at 45% 40%,
+    var(--orb-inner-bright) 0%,
+    transparent 50%
+  );
+  animation: orbInnerPulse 3s ease-in-out infinite;
+  opacity: 0.7;
+}
+
+/* Outer glow halo */
+.orb-halo {
+  inset: -40px;
+  background: radial-gradient(circle,
+    var(--orb-halo-color) 0%,
+    transparent 65%
+  );
+  border-radius: 50%;
+  opacity: 0.25;
+  animation: orbHaloPulse 4s ease-in-out infinite;
+  filter: blur(20px);
+}
+
+/* Surface sheen */
+.orb-sheen {
+  background: radial-gradient(ellipse at 30% 25%,
+    rgba(255,255,255,0.12) 0%,
+    transparent 55%
+  );
+}
+
+/* ---- ENERGY STATES ---- */
+
+/* State: High (1.0 → 0.7) — Warmes Gold-Weiß */
+.orb[data-energy="high"] {
+  --orb-core-bright:   rgba(232,213,168,0.95);
+  --orb-core-mid:      rgba(201,169,110,0.6);
+  --orb-core-dark:     rgba(122,97,64,0.3);
+  --orb-inner-bright:  rgba(255,248,220,0.8);
+  --orb-halo-color:    rgba(201,169,110,0.5);
+  filter: brightness(1.05);
+  animation-duration: 4s;
+}
+
+/* State: Mid (0.7 → 0.4) — Gedämpftes Warmweiß */
+.orb[data-energy="mid"] {
+  --orb-core-bright:   rgba(200,190,175,0.8);
+  --orb-core-mid:      rgba(150,140,125,0.5);
+  --orb-core-dark:     rgba(80,75,65,0.3);
+  --orb-inner-bright:  rgba(220,210,190,0.5);
+  --orb-halo-color:    rgba(150,140,120,0.3);
+  filter: brightness(0.85);
+  animation-duration: 5s;
+}
+
+/* State: Low (0.4 → 0.15) — Kühles Grau-Blau */
+.orb[data-energy="low"] {
+  --orb-core-bright:   rgba(142,155,174,0.7);
+  --orb-core-mid:      rgba(90,100,115,0.5);
+  --orb-core-dark:     rgba(40,45,55,0.4);
+  --orb-inner-bright:  rgba(160,170,185,0.35);
+  --orb-halo-color:    rgba(100,110,130,0.25);
+  filter: brightness(0.65);
+  animation-duration: 7s;
+}
+
+/* State: Critical (< 0.15) — Fast erloschen */
+.orb[data-energy="critical"] {
+  --orb-core-bright:   rgba(70,70,70,0.6);
+  --orb-core-mid:      rgba(45,45,45,0.5);
+  --orb-core-dark:     rgba(20,20,20,0.4);
+  --orb-inner-bright:  rgba(80,80,80,0.2);
+  --orb-halo-color:    rgba(50,50,50,0.15);
+  filter: brightness(0.45);
+  animation-duration: 9s;
+}
+
+/* ---- BREATH ANIMATION ---- */
+@keyframes orbBreath {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+}
+
+@keyframes orbInnerPulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.95); }
+  50%       { opacity: 0.85; transform: scale(1.05); }
+}
+
+@keyframes orbHaloPulse {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50%       { opacity: 0.35; transform: scale(1.08); }
+}
+
+/* ---- AHA FLASH ANIMATION ---- */
+.orb.orb-flash {
+  animation: orbFlash 2s var(--ease) forwards, orbBreath 4s ease-in-out infinite;
+}
+
+@keyframes orbFlash {
+  0%   { filter: brightness(1.05); }
+  15%  { filter: brightness(3); }
+  30%  { filter: brightness(2); }
+  60%  { filter: brightness(1.5); }
+  100% { filter: brightness(1.05); }
+}
+
+/* ---- BIRTH ANIMATION (erster Login) ---- */
+.orb.orb-birth {
+  animation: orbBirth 2.5s var(--ease) forwards;
+}
+
+@keyframes orbBirth {
+  0%   { transform: scale(0.1); opacity: 0; filter: brightness(3); }
+  40%  { transform: scale(1.15); opacity: 0.8; }
+  65%  { transform: scale(0.97); opacity: 0.95; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ---- TREMOR ANIMATION (lange Abwesenheit 7+ Tage) ---- */
+.orb.orb-tremor {
+  animation: orbTremor 0.4s ease-in-out infinite, orbBreath 9s ease-in-out infinite;
+}
+
+@keyframes orbTremor {
+  0%, 100% { transform: translateX(0) scale(1); }
+  25%       { transform: translateX(-2px) scale(1.005); }
+  75%       { transform: translateX(2px) scale(0.995); }
+}
+
+/* ---- FLOATING PARTICLES ---- */
+.orb-particles {
+  position: absolute;
+  inset: -60px;
+  pointer-events: none;
+}
+
+.orb-particle {
+  position: absolute;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: var(--accent-gold);
+  opacity: 0;
+  animation: particleFloat var(--duration, 4s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  top: var(--top, 50%);
+  left: var(--left, 50%);
+}
+
+@keyframes particleFloat {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.5); }
+  30%  { opacity: 0.6; }
+  70%  { opacity: 0.3; }
+  100% { opacity: 0; transform: translate(var(--tx, 0), var(--ty, -40px)) scale(0); }
+}
+
+/* ---- ORB STATUS TEXT ---- */
+.orb-status {
+  text-align: center;
+  margin-top: var(--space-3);
+  min-height: 48px;
+}
+
+.orb-status-text {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 300;
+  color: var(--text-secondary);
+  font-style: italic;
+  letter-spacing: 0.03em;
+  animation: fadeInUp 0.5s var(--ease);
+}
+
+.orb-energy-bar {
+  width: 60px;
+  height: 2px;
+  background: var(--border);
+  border-radius: 1px;
+  margin: 10px auto 0;
+  overflow: hidden;
+}
+
+.orb-energy-fill {
+  height: 100%;
+  background: var(--accent-gold);
+  border-radius: 1px;
+  transition: width 1s var(--ease);
+}
+
+/* ---- ORB SMALL (Landing) ---- */
+.orb-small {
+  width: 120px;
+  height: 120px;
+}
+
+.orb-tiny {
+  width: 60px;
+  height: 60px;
+}
+
+/* ---- LANDING ORB ---- */
+.orb-landing {
+  width: 160px;
+  height: 160px;
+  filter: brightness(0.7);
+}
+
+/* ---- STREAK RING ---- */
+.orb-ring {
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,169,110,0.15);
+  animation: ringPulse 4s ease-in-out infinite;
+}
+
+.orb-ring-2 {
+  position: absolute;
+  inset: -24px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,169,110,0.07);
+  animation: ringPulse 4s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
+@keyframes ringPulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50%       { opacity: 0.9; transform: scale(1.02); }
+}

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socrates — Reflexion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/orb.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script>
+    window.SOCRATES_CONFIG = {
+      supabaseUrl: '%%SUPABASE_URL%%',
+      supabaseAnonKey: '%%SUPABASE_ANON_KEY%%',
+    };
+  </script>
+</head>
+<body>
+
+<div class="reflection-shell" id="reflection-main">
+
+  <!-- Header -->
+  <header class="reflection-header">
+    <button class="reflection-back btn-subtle" id="back-btn">← Zurück</button>
+    <span class="reflection-phase" id="phase-label">Phase 1 / 4</span>
+    <span></span>
+  </header>
+
+  <!-- Progress -->
+  <div class="reflection-progress">
+    <div class="progress-bar" style="height:2px">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Phase 1: Fragen -->
+  <div id="phase-questions" class="reflection-main">
+    <div class="question-container">
+      <p class="question-number" id="question-number">Frage 1 von 4</p>
+      <h2 class="question-text" id="question-text"></h2>
+      <div class="question-answer-wrap">
+        <textarea
+          class="input textarea textarea-lg"
+          id="answer-input"
+          placeholder="Schreib ehrlich, was dir in den Sinn kommt..."
+          rows="6"
+        ></textarea>
+        <span class="char-count" id="char-count">0</span>
+      </div>
+      <div class="question-continue">
+        <button class="btn btn-primary btn-full" id="continue-btn" disabled>
+          Weiter
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 2: Dialog (hidden) -->
+  <div id="phase-dialog" style="display:none;flex:1;display:none;flex-direction:column">
+
+    <!-- AHA Button (oben) -->
+    <div style="padding:var(--space-1) var(--space-3);border-bottom:1px solid var(--border);display:flex;justify-content:flex-end">
+      <button class="aha-btn" id="aha-btn">
+        ◈ AHA-Moment markieren
+      </button>
+    </div>
+
+    <!-- Dialog Area -->
+    <div class="dialog-container" id="dialog-container"></div>
+
+    <!-- Input Area -->
+    <div class="dialog-input-area">
+      <div class="dialog-input-row">
+        <textarea
+          class="dialog-textarea"
+          id="dialog-input"
+          placeholder="Deine Antwort..."
+          rows="1"
+        ></textarea>
+        <button class="dialog-send-btn" id="dialog-send" disabled aria-label="Senden">
+          ↑
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 3: Abschluss (hidden) -->
+  <div id="phase-closing" style="display:none;flex:1;overflow-y:auto">
+    <div class="closing-screen">
+
+      <!-- Orb leuchtet -->
+      <div class="closing-orb-wrap">
+        <div class="orb-container" id="closing-orb" style="min-height:180px;flex:none"></div>
+      </div>
+
+      <div>
+        <h2 class="closing-title">Tiefe erreicht.</h2>
+        <p class="text-secondary" style="margin-top:8px;font-size:0.9rem">
+          Du hast dich heute wirklich hingeschaut.
+        </p>
+      </div>
+
+      <!-- Erkenntnis -->
+      <div class="closing-insight-block">
+        <p class="closing-insight-label">Deine Erkenntnis heute</p>
+        <p class="closing-insight-text" id="closing-insight-text"></p>
+      </div>
+
+      <!-- Übung -->
+      <div class="closing-exercise">
+        <p class="closing-exercise-label">Übung für morgen</p>
+        <p class="closing-exercise-text" id="closing-exercise-text"></p>
+      </div>
+
+      <button class="btn btn-primary btn-full" id="closing-done-btn">
+        Zur App
+      </button>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- AHA Modal -->
+<div class="modal-overlay" id="aha-modal">
+  <div class="modal" role="dialog" aria-labelledby="aha-title">
+    <h3 class="modal-title" id="aha-title">AHA-Moment</h3>
+    <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:var(--space-2)">
+      Was hast du gerade erkannt? Beschreibe es in deinen eigenen Worten.
+    </p>
+    <textarea
+      class="input textarea"
+      id="aha-input"
+      placeholder="Ich habe erkannt, dass..."
+      rows="4"
+    ></textarea>
+    <div style="display:flex;gap:var(--space-2);margin-top:var(--space-3)">
+      <button class="btn btn-ghost btn-sm" id="aha-cancel">Abbrechen</button>
+      <button class="btn btn-primary btn-sm" id="aha-save">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { guardRoute, navigate } from './js/router.js';
+  import { ReflectionManager, loadRecentSessions } from './js/session.js';
+  import { Orb } from './js/orb.js';
+  import {
+    showToast,
+    openModal,
+    closeModal,
+    autoResizeTextarea,
+    initCharCount,
+    scrollToBottom,
+    sanitizeText,
+    initPage,
+  } from './js/app.js';
+  import { escapeHtml } from './js/insights.js';
+
+  // Guard
+  const ctx = await guardRoute();
+  if (!ctx) {
+    // Weiterleitung
+  } else {
+    initReflection(ctx.user, ctx.profile);
+  }
+
+  async function initReflection(user, profile) {
+    initPage(document.getElementById('reflection-main'));
+
+    const manager = new ReflectionManager();
+    const ok = await manager.init();
+    if (!ok) return;
+
+    // Phase 1: Fragen
+    let currentQ = 0;
+    const totalQ = manager.getTotalQuestions();
+
+    const questionText = document.getElementById('question-text');
+    const answerInput = document.getElementById('answer-input');
+    const continueBtn = document.getElementById('continue-btn');
+    const questionNumber = document.getElementById('question-number');
+    const progressFill = document.getElementById('progress-fill');
+    const charCount = document.getElementById('char-count');
+    const phaseLabel = document.getElementById('phase-label');
+
+    function showQuestion(index) {
+      const q = manager.getQuestion(index);
+      if (!q) return;
+
+      questionText.classList.remove('fade-in-up');
+      void questionText.offsetWidth;
+      questionText.classList.add('fade-in-up');
+
+      questionText.textContent = q.text;
+      questionNumber.textContent = `Frage ${index + 1} von ${totalQ}`;
+      phaseLabel.textContent = `Phase ${index + 1} / ${totalQ}`;
+      progressFill.style.width = `${((index) / totalQ) * 60}%`;
+      answerInput.value = '';
+      answerInput.focus();
+      continueBtn.disabled = true;
+      charCount.textContent = '0';
+      charCount.style.color = 'var(--text-muted)';
+    }
+
+    // Char-Count + Min-Zeichen
+    answerInput.addEventListener('input', () => {
+      const len = answerInput.value.length;
+      charCount.textContent = len;
+      continueBtn.disabled = len < 20;
+      charCount.style.color = len >= 20 ? 'var(--accent-gold-dim)' : 'var(--text-muted)';
+    });
+
+    // Weiter-Button
+    continueBtn.addEventListener('click', async () => {
+      const answer = sanitizeText(answerInput.value);
+      continueBtn.classList.add('loading');
+      continueBtn.disabled = true;
+
+      try {
+        await manager.saveAnswer(currentQ, answer);
+
+        if (manager.isLastQuestion()) {
+          // Zu Phase 2 übergehen
+          await transitionToDialog();
+        } else {
+          currentQ++;
+          showQuestion(currentQ);
+        }
+      } catch {
+        showToast('Fehler beim Speichern. Bitte versuche es erneut.', 'error');
+      } finally {
+        continueBtn.classList.remove('loading');
+        continueBtn.disabled = false;
+      }
+    });
+
+    // Erste Frage anzeigen
+    showQuestion(0);
+
+    // Zurück-Button
+    document.getElementById('back-btn').addEventListener('click', () => {
+      if (confirm('Session verlassen? Deine bisherigen Antworten werden gespeichert.')) {
+        navigate('app');
+      }
+    });
+
+    /* ---- PHASE 2: DIALOG ---- */
+
+    let dialogOrb = null;
+    let isSending = false;
+
+    async function transitionToDialog() {
+      // Progress auf 60%
+      progressFill.style.width = '60%';
+      phaseLabel.textContent = 'Sokratischer Dialog';
+
+      document.getElementById('phase-questions').style.display = 'none';
+      const dialogPhase = document.getElementById('phase-dialog');
+      dialogPhase.style.display = 'flex';
+      dialogPhase.style.flexDirection = 'column';
+      dialogPhase.style.flex = '1';
+
+      // Typing indicator zeigen
+      const dialogContainer = document.getElementById('dialog-container');
+      showTyping(dialogContainer);
+
+      try {
+        const prevSessions = await loadRecentSessions(user.id);
+        const openingReply = await manager.startDialog(prevSessions);
+        hideTyping(dialogContainer);
+        appendSocratesMessage(dialogContainer, openingReply);
+      } catch {
+        hideTyping(dialogContainer);
+        showToast('Verbindung zu Socrates unterbrochen. Bitte versuche es erneut.', 'error');
+      }
+
+      setupDialogInput();
+    }
+
+    function setupDialogInput() {
+      const dialogInput = document.getElementById('dialog-input');
+      const dialogSend = document.getElementById('dialog-send');
+      const dialogContainer = document.getElementById('dialog-container');
+
+      autoResizeTextarea(dialogInput);
+
+      dialogInput.addEventListener('input', () => {
+        dialogSend.disabled = dialogInput.value.trim().length === 0;
+      });
+
+      dialogInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey && !dialogSend.disabled) {
+          e.preventDefault();
+          dialogSend.click();
+        }
+      });
+
+      dialogSend.addEventListener('click', async () => {
+        if (isSending) return;
+        const text = sanitizeText(dialogInput.value);
+        if (!text) return;
+
+        isSending = true;
+        dialogInput.value = '';
+        dialogSend.disabled = true;
+        dialogInput.style.height = 'auto';
+
+        // User-Nachricht anzeigen
+        appendUserMessage(dialogContainer, text);
+        scrollToBottom(dialogContainer);
+
+        // Schließungs-Trigger: "Letzter Satz" → Abschluss einleiten
+        const isClosingInput = manager.isClosingTriggered() &&
+          manager.isReadyToClose();
+
+        // Typing indicator
+        showTyping(dialogContainer);
+        scrollToBottom(dialogContainer);
+
+        try {
+          if (isClosingInput) {
+            // Finales Statement → Abschluss generieren
+            hideTyping(dialogContainer);
+            await transitionToClosing(text);
+          } else {
+            const reply = await manager.sendUserMessage(text);
+            hideTyping(dialogContainer);
+
+            if (reply) {
+              appendSocratesMessage(dialogContainer, reply);
+
+              // Wenn Abschluss eingeleitet → finalen Prompt zeigen
+              if (manager.isClosingTriggered() && manager.isReadyToClose()) {
+                progressFill.style.width = '85%';
+              }
+            }
+          }
+        } catch {
+          hideTyping(dialogContainer);
+          showToast('Verbindung unterbrochen. Bitte versuche es erneut.', 'error');
+        } finally {
+          isSending = false;
+          scrollToBottom(dialogContainer);
+        }
+      });
+    }
+
+    /* ---- PHASE 3: ABSCHLUSS ---- */
+
+    async function transitionToClosing(finalResponse) {
+      progressFill.style.width = '90%';
+
+      try {
+        const closing = await manager.finishSession(finalResponse);
+
+        document.getElementById('phase-dialog').style.display = 'none';
+        const closingPhase = document.getElementById('phase-closing');
+        closingPhase.style.display = 'block';
+        phaseLabel.textContent = 'Abschluss';
+        progressFill.style.width = '100%';
+
+        // Orb rendern + aufleuchten
+        const closingOrbContainer = document.getElementById('closing-orb');
+        dialogOrb = new Orb('#closing-orb');
+        dialogOrb.setEnergy(1.0);
+        setTimeout(() => dialogOrb.flash(), 500);
+
+        // Inhalte befüllen
+        document.getElementById('closing-insight-text').textContent =
+          closing.closing_insight || '';
+        document.getElementById('closing-exercise-text').textContent =
+          closing.exercise_tomorrow || '';
+
+        document.getElementById('closing-done-btn').addEventListener('click', () => {
+          navigate('app');
+        });
+
+      } catch {
+        showToast('Fehler beim Abschluss. Bitte versuche es erneut.', 'error');
+      }
+    }
+
+    /* ---- AHA MOMENT ---- */
+
+    const ahaModal = document.getElementById('aha-modal');
+    const ahaInput = document.getElementById('aha-input');
+
+    document.getElementById('aha-btn').addEventListener('click', () => {
+      ahaInput.value = '';
+      openModal(ahaModal);
+      ahaInput.focus();
+    });
+
+    document.getElementById('aha-cancel').addEventListener('click', () => {
+      closeModal(ahaModal);
+    });
+
+    ahaModal.addEventListener('click', (e) => {
+      if (e.target === ahaModal) closeModal(ahaModal);
+    });
+
+    document.getElementById('aha-save').addEventListener('click', async () => {
+      const content = sanitizeText(ahaInput.value);
+      if (!content) return;
+
+      const saveBtn = document.getElementById('aha-save');
+      saveBtn.classList.add('loading');
+      saveBtn.disabled = true;
+
+      try {
+        await manager.markAhaMoment(content);
+        closeModal(ahaModal);
+
+        // Orb flash in Dialog-Phase
+        const tempOrb = document.querySelector('#closing-orb .orb') ||
+          document.querySelector('.orb');
+        if (tempOrb && dialogOrb) {
+          dialogOrb.flash();
+        }
+
+        showToast('AHA-Moment gespeichert ✓', 'success');
+      } catch {
+        showToast('Fehler beim Speichern.', 'error');
+      } finally {
+        saveBtn.classList.remove('loading');
+        saveBtn.disabled = false;
+      }
+    });
+
+    /* ---- DIALOG HELPERS ---- */
+
+    function appendSocratesMessage(container, text) {
+      const div = document.createElement('div');
+      div.className = 'dialog-message socrates fade-in-up';
+      div.innerHTML = `
+        <p class="dialog-sender">Socrates</p>
+        <p class="dialog-text">${escapeHtml(text)}</p>
+      `;
+      container.appendChild(div);
+      scrollToBottom(container);
+    }
+
+    function appendUserMessage(container, text) {
+      const div = document.createElement('div');
+      div.className = 'dialog-message user fade-in-up';
+      div.innerHTML = `
+        <p class="dialog-sender">Du</p>
+        <p class="dialog-text">${escapeHtml(text)}</p>
+      `;
+      container.appendChild(div);
+    }
+
+    let typingEl = null;
+
+    function showTyping(container) {
+      typingEl = document.createElement('div');
+      typingEl.className = 'dialog-message socrates';
+      typingEl.id = 'typing-indicator';
+      typingEl.innerHTML = `
+        <div class="typing-indicator">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      `;
+      container.appendChild(typingEl);
+    }
+
+    function hideTyping(container) {
+      typingEl?.remove();
+      typingEl = null;
+    }
+  }
+</script>
+
+</body>
+</html>

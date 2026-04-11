@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Socrates — Die einzige App, die dir täglich die Frage stellt, die du dir selbst nicht stellen würdest.">
+  <title>Socrates — Tägliche Reflexion</title>
+
+  <!-- Preconnect fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/orb.css">
+  <link rel="stylesheet" href="css/landing.css">
+
+  <!-- Config (ausgefüllt vom Netlify-Build oder lokal) -->
+  <script>
+    window.SOCRATES_CONFIG = {
+      supabaseUrl: '%%SUPABASE_URL%%',
+      supabaseAnonKey: '%%SUPABASE_ANON_KEY%%',
+    };
+  </script>
+</head>
+<body>
+
+  <!-- Hintergrund-Glow -->
+  <div class="landing-bg-glow" aria-hidden="true"></div>
+
+  <!-- Loading Overlay -->
+  <div id="auth-loading" class="auth-loading" style="display:none">
+    <div class="auth-loading-logo">Socrates</div>
+    <div class="spinner"></div>
+  </div>
+
+  <div class="landing-shell" id="landing-main">
+
+    <!-- Hero -->
+    <section class="landing-hero">
+      <!-- Orb -->
+      <div class="landing-orb-wrap">
+        <div class="orb-container" style="min-height:200px">
+          <div class="orb-scene">
+            <div class="orb orb-landing" data-energy="mid" id="landing-orb">
+              <div class="orb-layer orb-halo"></div>
+              <div class="orb-layer orb-base"></div>
+              <div class="orb-layer orb-inner"></div>
+              <div class="orb-layer orb-sheen"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h1 class="landing-logo">Socrates</h1>
+      <p class="landing-tagline">
+        Die einzige App, die dir täglich die Frage stellt, die du dir selbst nicht stellen würdest.
+      </p>
+    </section>
+
+    <!-- Login Section -->
+    <section class="landing-login" id="login-section">
+      <p class="landing-cta-label">Beginne deine Reise</p>
+
+      <!-- Magic Link Form -->
+      <form class="login-form" id="login-form" novalidate>
+        <div class="input-wrap">
+          <label class="input-label" for="email-input">Deine E-Mail-Adresse</label>
+          <input
+            type="email"
+            id="email-input"
+            class="input"
+            placeholder="du@beispiel.de"
+            autocomplete="email"
+            inputmode="email"
+            required
+          >
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" id="login-btn">
+          Magic Link erhalten
+        </button>
+        <p id="login-error" class="input-error-msg" style="display:none;text-align:center"></p>
+      </form>
+
+      <!-- Nach Absenden -->
+      <div class="magic-link-sent" id="magic-sent" style="display:none">
+        <span class="magic-link-icon">✉</span>
+        <h2 class="magic-link-title">Link gesendet</h2>
+        <p class="magic-link-sub">
+          Wir haben einen magischen Login-Link an<br>
+          <span class="magic-link-email" id="sent-email"></span><br>
+          gesendet. Klick ihn an — du wirst automatisch eingeloggt.
+        </p>
+        <button class="btn btn-subtle" id="resend-btn" style="margin-top:var(--space-3)">
+          Erneut senden
+        </button>
+      </div>
+    </section>
+
+    <!-- Feature Points -->
+    <section class="landing-features" aria-label="Features">
+      <div class="feature-item">
+        <span class="feature-icon">◐</span>
+        <p class="feature-text">Sokratische Dialektik statt leerer Ratschläge</p>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">◎</span>
+        <p class="feature-text">Eine lebendige Seele wächst mit dir</p>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">◇</span>
+        <p class="feature-text">Muster erkennen, Klarheit gewinnen</p>
+      </div>
+    </section>
+
+  </div>
+
+  <script type="module">
+    import { sendMagicLink, getSession, getProfile } from './js/supabase.js';
+    import { initAuthListener } from './js/router.js';
+    import { isValidEmail, sanitizeText } from './js/app.js';
+
+    // Auth-Listener starten
+    initAuthListener();
+
+    // Auth-Check: Wenn bereits eingeloggt → weiterleiten
+    async function checkExistingSession() {
+      const loading = document.getElementById('auth-loading');
+      try {
+        loading.style.display = 'flex';
+        const session = await getSession();
+        if (session) {
+          const profile = await getProfile(session.user.id);
+          if (profile?.onboarding_done) {
+            window.location.href = '/socrates/app.html';
+          } else {
+            window.location.href = '/socrates/onboarding.html';
+          }
+          return;
+        }
+      } catch {
+        // kein Session — ok
+      } finally {
+        loading.style.display = 'none';
+      }
+    }
+
+    checkExistingSession();
+
+    // Landing Orb animieren
+    const landingOrb = document.getElementById('landing-orb');
+    if (landingOrb) {
+      setTimeout(() => {
+        landingOrb.style.transition = 'filter 2s ease';
+        landingOrb.style.filter = 'brightness(0.9)';
+      }, 500);
+    }
+
+    // Login Form
+    const form = document.getElementById('login-form');
+    const emailInput = document.getElementById('email-input');
+    const loginBtn = document.getElementById('login-btn');
+    const loginError = document.getElementById('login-error');
+    const magicSent = document.getElementById('magic-sent');
+    const loginSection = document.getElementById('login-section');
+    const sentEmail = document.getElementById('sent-email');
+    const resendBtn = document.getElementById('resend-btn');
+
+    let lastEmail = '';
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loginError.style.display = 'none';
+
+      const email = sanitizeText(emailInput.value);
+      if (!isValidEmail(email)) {
+        loginError.textContent = 'Bitte gib eine gültige E-Mail-Adresse ein.';
+        loginError.style.display = 'block';
+        emailInput.classList.add('input-error');
+        return;
+      }
+
+      emailInput.classList.remove('input-error');
+      loginBtn.classList.add('loading');
+      loginBtn.disabled = true;
+
+      try {
+        await sendMagicLink(email);
+        lastEmail = email;
+        sentEmail.textContent = email;
+
+        // Formular ausblenden, Erfolg zeigen
+        form.style.display = 'none';
+        magicSent.style.display = 'block';
+      } catch (err) {
+        loginError.textContent = 'Etwas ist schiefgelaufen. Bitte versuche es erneut.';
+        loginError.style.display = 'block';
+      } finally {
+        loginBtn.classList.remove('loading');
+        loginBtn.disabled = false;
+      }
+    });
+
+    emailInput.addEventListener('input', () => {
+      emailInput.classList.remove('input-error');
+      loginError.style.display = 'none';
+    });
+
+    resendBtn.addEventListener('click', async () => {
+      resendBtn.classList.add('loading');
+      resendBtn.disabled = true;
+      try {
+        await sendMagicLink(lastEmail);
+        resendBtn.textContent = 'Link gesendet ✓';
+        setTimeout(() => {
+          resendBtn.textContent = 'Erneut senden';
+          resendBtn.disabled = false;
+          resendBtn.classList.remove('loading');
+        }, 3000);
+      } catch {
+        resendBtn.classList.remove('loading');
+        resendBtn.disabled = false;
+      }
+    });
+  </script>
+
+</body>
+</html>

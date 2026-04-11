@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socrates — Einstellungen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script>
+    window.SOCRATES_CONFIG = {
+      supabaseUrl: '%%SUPABASE_URL%%',
+      supabaseAnonKey: '%%SUPABASE_ANON_KEY%%',
+    };
+  </script>
+</head>
+<body>
+
+<div class="app-shell" id="settings-main">
+
+  <!-- Header -->
+  <header class="app-header">
+    <span></span>
+    <span class="app-header-logo">Socrates</span>
+    <span></span>
+  </header>
+
+  <!-- Main -->
+  <main class="app-main">
+
+    <!-- Profil-Info -->
+    <div style="text-align:center;padding:var(--space-4) 0 var(--space-3)">
+      <p class="text-display" style="font-size:1.6rem" id="profile-name">—</p>
+      <p class="text-small text-muted" id="profile-email" style="margin-top:4px"></p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Profil-Einstellungen -->
+    <div class="settings-section">
+      <p class="settings-section-title">Profil</p>
+
+      <div class="settings-row">
+        <div>
+          <p class="settings-label">Name</p>
+          <p class="settings-hint" id="name-display">Wird geladen...</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="edit-name-btn">Ändern</button>
+      </div>
+
+      <div class="settings-row">
+        <div>
+          <p class="settings-label">Reflexionszeit</p>
+          <p class="settings-hint" id="time-display">Wird geladen...</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="edit-time-btn">Ändern</button>
+      </div>
+    </div>
+
+    <!-- Konto -->
+    <div class="settings-section">
+      <p class="settings-section-title">Konto</p>
+
+      <div class="settings-row">
+        <div>
+          <p class="settings-label">Ausloggen</p>
+          <p class="settings-hint">Du wirst zur Startseite weitergeleitet.</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="logout-btn">Logout</button>
+      </div>
+
+      <div class="settings-row">
+        <div>
+          <p class="settings-label" style="color:#c0392b">Konto löschen</p>
+          <p class="settings-hint">Alle Daten werden dauerhaft gelöscht.</p>
+        </div>
+        <button class="btn btn-danger btn-sm" id="delete-account-btn">Löschen</button>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="settings-section">
+      <p class="settings-section-title">Info</p>
+      <div class="settings-row">
+        <p class="settings-label">Version</p>
+        <p class="text-small text-muted">1.0.0</p>
+      </div>
+      <div class="settings-row">
+        <p class="settings-label">Datenschutz</p>
+        <a href="#" class="text-small text-muted" style="text-decoration:underline">Datenschutzerklärung</a>
+      </div>
+      <div class="settings-row">
+        <p class="settings-label">Impressum</p>
+        <a href="#" class="text-small text-muted" style="text-decoration:underline">Impressum</a>
+      </div>
+    </div>
+
+    <p class="text-muted text-small text-center" style="margin-top:var(--space-4)">
+      Socrates — Tägliche Reflexion
+    </p>
+
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav" aria-label="Hauptnavigation">
+    <a href="app.html" class="nav-item" id="nav-today" aria-label="Heute">
+      <span class="nav-icon">◎</span>
+      <span class="nav-label">Heute</span>
+    </a>
+    <a href="insights.html" class="nav-item" id="nav-insights" aria-label="Erkenntnisse">
+      <span class="nav-icon">◇</span>
+      <span class="nav-label">Erkenntnisse</span>
+    </a>
+    <a href="settings.html" class="nav-item active" id="nav-settings" aria-label="Einstellungen">
+      <span class="nav-icon">◱</span>
+      <span class="nav-label">Einstellungen</span>
+    </a>
+  </nav>
+
+</div>
+
+<!-- Name Ändern Modal -->
+<div class="modal-overlay" id="name-modal">
+  <div class="modal" role="dialog">
+    <h3 class="modal-title">Name ändern</h3>
+    <div style="margin-top:var(--space-2)">
+      <input type="text" class="input" id="name-edit-input" placeholder="Dein Name" maxlength="50">
+    </div>
+    <div style="display:flex;gap:var(--space-2);margin-top:var(--space-3)">
+      <button class="btn btn-ghost btn-sm" id="name-cancel">Abbrechen</button>
+      <button class="btn btn-primary btn-sm" id="name-save">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- Zeit Ändern Modal -->
+<div class="modal-overlay" id="time-modal">
+  <div class="modal" role="dialog">
+    <h3 class="modal-title">Reflexionszeit</h3>
+    <div class="time-grid" style="margin-top:var(--space-2)">
+      <div class="time-option" data-value="morgen">
+        <div class="time-option-icon">☀</div>
+        <div class="time-option-label">Morgen</div>
+      </div>
+      <div class="time-option" data-value="mittag">
+        <div class="time-option-icon">◑</div>
+        <div class="time-option-label">Mittag</div>
+      </div>
+      <div class="time-option" data-value="abend">
+        <div class="time-option-icon">☽</div>
+        <div class="time-option-label">Abend</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:var(--space-2);margin-top:var(--space-3)">
+      <button class="btn btn-ghost btn-sm" id="time-cancel">Abbrechen</button>
+      <button class="btn btn-primary btn-sm" id="time-save">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { guardRoute, navigate } from './js/router.js';
+  import {
+    getProfile,
+    updateProfile,
+    signOut,
+    deleteAccount,
+    getCurrentUser,
+  } from './js/supabase.js';
+  import {
+    showToast,
+    openModal,
+    closeModal,
+    createConfirmModal,
+    sanitizeText,
+    initPage,
+  } from './js/app.js';
+
+  const ctx = await guardRoute();
+  if (!ctx) {
+    // Weiterleitung
+  } else {
+    initSettings(ctx.user, ctx.profile);
+  }
+
+  async function initSettings(user, profile) {
+    initPage(document.getElementById('settings-main'));
+
+    let currentProfile = profile;
+
+    const timeLabels = {
+      morgen: 'Morgen',
+      mittag: 'Mittag',
+      abend:  'Abend',
+    };
+
+    function renderProfile(p) {
+      document.getElementById('profile-name').textContent = p.name || 'Unbekannt';
+      document.getElementById('profile-email').textContent = user.email || '';
+      document.getElementById('name-display').textContent = p.name || '—';
+      document.getElementById('time-display').textContent =
+        timeLabels[p.reflection_time] || 'Nicht festgelegt';
+    }
+
+    renderProfile(currentProfile);
+
+    /* ---- NAME ÄNDERN ---- */
+    const nameModal = document.getElementById('name-modal');
+    const nameInput = document.getElementById('name-edit-input');
+
+    document.getElementById('edit-name-btn').addEventListener('click', () => {
+      nameInput.value = currentProfile.name || '';
+      openModal(nameModal);
+      nameInput.focus();
+    });
+
+    document.getElementById('name-cancel').addEventListener('click', () => {
+      closeModal(nameModal);
+    });
+
+    nameModal.addEventListener('click', (e) => {
+      if (e.target === nameModal) closeModal(nameModal);
+    });
+
+    document.getElementById('name-save').addEventListener('click', async () => {
+      const name = sanitizeText(nameInput.value);
+      if (!name || name.length < 1) {
+        showToast('Bitte gib einen Namen ein.', 'error');
+        return;
+      }
+
+      const saveBtn = document.getElementById('name-save');
+      saveBtn.classList.add('loading');
+      saveBtn.disabled = true;
+
+      try {
+        currentProfile = await updateProfile(user.id, { name });
+        renderProfile(currentProfile);
+        closeModal(nameModal);
+        showToast('Name gespeichert ✓', 'success');
+      } catch {
+        showToast('Fehler beim Speichern.', 'error');
+      } finally {
+        saveBtn.classList.remove('loading');
+        saveBtn.disabled = false;
+      }
+    });
+
+    /* ---- ZEIT ÄNDERN ---- */
+    const timeModal = document.getElementById('time-modal');
+    const timeOptions = timeModal.querySelectorAll('.time-option');
+    let selectedTime = currentProfile.reflection_time || 'abend';
+
+    document.getElementById('edit-time-btn').addEventListener('click', () => {
+      timeOptions.forEach(o => {
+        o.classList.toggle('selected', o.dataset.value === selectedTime);
+      });
+      openModal(timeModal);
+    });
+
+    timeOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        timeOptions.forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        selectedTime = opt.dataset.value;
+      });
+    });
+
+    document.getElementById('time-cancel').addEventListener('click', () => {
+      closeModal(timeModal);
+    });
+
+    timeModal.addEventListener('click', (e) => {
+      if (e.target === timeModal) closeModal(timeModal);
+    });
+
+    document.getElementById('time-save').addEventListener('click', async () => {
+      const saveBtn = document.getElementById('time-save');
+      saveBtn.classList.add('loading');
+      saveBtn.disabled = true;
+
+      try {
+        currentProfile = await updateProfile(user.id, { reflection_time: selectedTime });
+        renderProfile(currentProfile);
+        closeModal(timeModal);
+        showToast('Gespeichert ✓', 'success');
+      } catch {
+        showToast('Fehler beim Speichern.', 'error');
+      } finally {
+        saveBtn.classList.remove('loading');
+        saveBtn.disabled = false;
+      }
+    });
+
+    /* ---- LOGOUT ---- */
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('logout-btn');
+      btn.classList.add('loading');
+      btn.disabled = true;
+      try {
+        await signOut();
+      } catch {
+        showToast('Fehler beim Ausloggen.', 'error');
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    });
+
+    /* ---- KONTO LÖSCHEN ---- */
+    document.getElementById('delete-account-btn').addEventListener('click', () => {
+      createConfirmModal(
+        'Bist du sicher? Alle deine Daten — Sessions, Erkenntnisse, Muster — werden dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.',
+        async () => {
+          const btn = document.getElementById('delete-account-btn');
+          btn.classList.add('loading');
+          btn.disabled = true;
+
+          try {
+            await deleteAccount(user.id);
+            navigate('landing');
+          } catch {
+            showToast('Fehler beim Löschen. Bitte kontaktiere den Support.', 'error');
+            btn.classList.remove('loading');
+            btn.disabled = false;
+          }
+        }
+      );
+    });
+  }
+</script>
+
+</body>
+</html>

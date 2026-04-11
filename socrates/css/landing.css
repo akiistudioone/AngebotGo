@@ -1,0 +1,203 @@
+/* ============================================================
+   SOCRATES — LANDING CSS
+   Landing Page · Hero · Login Form · Features
+   ============================================================ */
+
+/* ---- LANDING SHELL ---- */
+.landing-shell {
+  max-width: var(--max-w);
+  margin-inline: auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-6) var(--space-3) var(--space-5);
+  position: relative;
+}
+
+/* ---- HERO SECTION ---- */
+.landing-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+}
+
+.landing-orb-wrap {
+  position: relative;
+  margin-bottom: var(--space-2);
+}
+
+.landing-logo {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 12vw, 5rem);
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  color: var(--text-primary);
+  line-height: 1;
+  animation: fadeInUp 0.8s var(--ease) 0.1s both;
+}
+
+.landing-tagline {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 3.5vw, 1.2rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 340px;
+  animation: fadeInUp 0.8s var(--ease) 0.3s both;
+}
+
+/* ---- LOGIN SECTION ---- */
+.landing-login {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  animation: fadeInUp 0.8s var(--ease) 0.5s both;
+}
+
+.landing-cta-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Magic Link Success */
+.magic-link-sent {
+  text-align: center;
+  padding: var(--space-4) var(--space-3);
+  animation: fadeInUp 0.5s var(--ease);
+}
+
+.magic-link-icon {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-2);
+  display: block;
+}
+
+.magic-link-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 300;
+  margin-bottom: var(--space-1);
+}
+
+.magic-link-sub {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.magic-link-email {
+  color: var(--accent-gold);
+  font-weight: 500;
+}
+
+/* ---- FEATURE POINTS ---- */
+.landing-features {
+  width: 100%;
+  display: flex;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+  animation: fadeInUp 0.8s var(--ease) 0.7s both;
+}
+
+.feature-item {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.feature-icon {
+  font-size: 1.1rem;
+  opacity: 0.6;
+}
+
+.feature-text {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* ---- LOADING OVERLAY ---- */
+.auth-loading {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  z-index: 9000;
+}
+
+.auth-loading-logo {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  color: var(--text-secondary);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
+}
+
+/* ---- BACKGROUND DECORATIONS ---- */
+.landing-bg-glow {
+  position: fixed;
+  top: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle,
+    rgba(201,169,110,0.03) 0%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.landing-shell > * {
+  position: relative;
+  z-index: 1;
+}
